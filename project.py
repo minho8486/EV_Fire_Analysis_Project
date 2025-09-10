@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import plotly.express as px
 import plotly.graph_objects as go
 
 plt.rcParams['font.family'] = 'Malgun Gothic'
@@ -10,10 +9,10 @@ plt.rcParams['axes.unicode_minus'] = False
 st.set_page_config(layout="wide", page_title="전기차 화재 분석", page_icon="🔥")
 
 # ===== 데이터 불러오기 =====
-fire_total = "통합_화재_통계_2021-2023.csv"
+fire_total = "통합_화재_통계.csv"
 fire_EV    = "전기차_화재_통계.csv"
 charger    = "전국_충전소_데이터.csv"
-car_info   = "자동차_등록_대수_대수_현황.csv"
+car_info   = "자동차_등록_대수_현황.csv"
 
 df_fire_total = pd.read_csv(fire_total, encoding="utf-8-sig")
 df_fire_EV    = pd.read_csv(fire_EV, encoding="utf-8-sig")
@@ -24,7 +23,6 @@ df_car_info   = pd.read_csv(car_info, encoding="utf-8-sig")
 df_fire_total = df_fire_total[df_fire_total["장소소분류"] == "승용자동차"].copy()
 df_fire_total["연도"] = pd.to_datetime(df_fire_total["일시"], errors="coerce").dt.year
 df_fire_EV["연도"] = pd.to_datetime(df_fire_EV["화재발생일"], errors="coerce").dt.year
-
 
 # ===== Sidebar 필터 =====
 st.sidebar.header("필터")
@@ -38,9 +36,9 @@ else:
         default=sorted(df_fire_EV["연도"].dropna().unique())
     )
 
-region_filter = st.sidebar.multiselect("시도 선택", df_fire_EV["시도"].dropna().unique())
+region_filter = st.sidebar.multiselect("지역 선택", df_fire_EV["시도"].dropna().unique())
 status_filter = st.sidebar.multiselect("차량상태 선택", df_fire_EV["차량상태"].dropna().unique())
-cause_filter  = st.sidebar.multiselect("발화요인 선택", df_fire_EV["발화요인대분류"].dropna().unique())
+cause_filter  = st.sidebar.multiselect("발화요인 대분류 선택", df_fire_EV["발화요인대분류"].dropna().unique())
 subcause_filter = st.sidebar.multiselect("발화요인 소분류 선택", df_fire_EV["발화요인소분류"].dropna().unique())
 
 # ===== 필터 적용 데이터 =====
@@ -61,131 +59,362 @@ ev_fire_cause_all = df_fire_EV["발화요인대분류"].value_counts()
 ev_vehicle_status_all = df_fire_EV["차량상태"].value_counts()
 
 # ===== 탭 구조 =====
-tab1, tab2 = st.tabs(["📊 주요 분석 (전체)", "🔥 발화요인 & 차량상태 (필터 적용)"])
+tab1, tab2, tab3 = st.tabs(["📊 주요 분석 페이지", "🔥 전기차 화재 분석 페이지", "📍 지역별 충전소 대비 화재 분석"])
+
+# ===== KPI 카드 스타일 =====
+kpi_style = """
+<style>
+.kpi-card {
+    padding: 20px;
+    border-radius: 15px;
+    color: white;
+    text-align: center;
+    box-shadow: 2px 2px 12px rgba(0,0,0,0.15);
+    margin: 10px;
+}
+.kpi-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.kpi-value {
+    font-size: 28px;
+    font-weight: bold;
+}
+.kpi-1 { background: linear-gradient(135deg, #6a11cb, #2575fc); }
+.kpi-2 { background: linear-gradient(135deg, #fff176, #dd2476); }
+.kpi-3 { background: linear-gradient(135deg, #11998e, #38ef7d); }
+</style>
+"""
 
 # ==============================
-# Tab1: 전체 데이터 KPI + 분석 (대시보드형)
+# Tab1: 전체 데이터 KPI + Plotly 시각화
 # ==============================
 with tab1:
-    st.markdown("## 🔥 전기차 화재 대시보드 (전체 데이터 기준)")
+    st.markdown("### 🔥 전기차 화재 분석")
 
-    # ===== KPI 카드 =====
+    st.markdown(kpi_style, unsafe_allow_html=True)
+
+    # ===== KPI 값 =====
     total_fire_count = len(df_fire_total)
     ev_fire_count = len(df_fire_EV)
     ev_fire_ratio = round(ev_fire_count / total_fire_count * 100, 2)
 
-    kpi_col1, kpi_col2, kpi_col3 = st.columns(3)
-    kpi_col1.metric("전체 차량 화재 건수", total_fire_count, delta=None)
-    kpi_col2.metric("전기차 화재 건수", ev_fire_count, delta=None)
-    kpi_col3.metric("전기차 화재 비율 (%)", f"{ev_fire_ratio}%", delta=None)
+    # ===== KPI 카드 표시 =====
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f"""
+        <div class="kpi-card kpi-1">
+            <div class="kpi-title">전체 차량 화재 건수</div>
+            <div class="kpi-value">{total_fire_count:,} 건</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    # ===== 누적 화재 추세 (Plotly Interactive) =====
-    st.markdown("### 📈 연도별 누적 화재 건수")
-    df_cum_ev = df_fire_EV.groupby("연도").size().cumsum().reset_index(name="EV 누적")
-    df_cum_total = df_fire_total.groupby("연도").size().cumsum().reset_index(name="전체 누적")
-    fig_cum = go.Figure()
-    fig_cum.add_trace(go.Scatter(x=df_cum_ev["연도"], y=df_cum_ev["EV 누적"],
-                                 mode='lines+markers', name="전기차 누적", line=dict(color='red')))
-    fig_cum.add_trace(go.Scatter(x=df_cum_total["연도"], y=df_cum_total["전체 누적"],
-                                 mode='lines+markers', name="전체 승용차 누적", line=dict(color='blue')))
-    fig_cum.update_layout(xaxis_title="연도", yaxis_title="누적 화재 건수", template="plotly_white")
-    st.plotly_chart(fig_cum, use_container_width=True)
+    with col2:
+        st.markdown(f"""
+        <div class="kpi-card kpi-2">
+            <div class="kpi-title">전기차 화재 건수</div>
+            <div class="kpi-value">{ev_fire_count:,} 건</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    # ===== 연도별 EV vs 전체 비율 =====
-    st.markdown("### ⚖️ 연도별 전기차 화재 비율 (%)")
-    ev_by_year = df_fire_EV.groupby("연도").size()
-    total_by_year = df_fire_total.groupby("연도").size()
-    ratio = (ev_by_year / total_by_year * 100).round(2)
-    fig_ratio = px.bar(x=ratio.index, y=ratio.values, text=ratio.values, labels={"x":"연도","y":"비율 (%)"})
-    fig_ratio.update_traces(texttemplate="%{text}%", textposition="outside", marker_color="salmon")
-    st.plotly_chart(fig_ratio, use_container_width=True)
+    with col3:
+        st.markdown(f"""
+        <div class="kpi-card kpi-3">
+            <div class="kpi-title">전기차 화재 비율</div>
+            <div class="kpi-value">{ev_fire_ratio}%</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    # ===== 충전소 vs 화재 건수 =====
-    st.markdown("### 🔌 지역별 충전소 개수 vs 전기차 화재 건수")
-    ev_region = df_fire_EV["시도"].value_counts()
-    charger_region = df_charger["시도"].value_counts().reindex(ev_region.index)
-    fig, ax = plt.subplots(figsize=(8,6))
-    sns.regplot(x=charger_region, y=ev_region, ax=ax, scatter_kws={"s":100, "color":"purple"})
-    ax.set_xlabel("충전소 개수")
-    ax.set_ylabel("EV 화재 건수")
-    ax.set_title("충전소 개수 vs EV 화재 건수")
-    st.pyplot(fig)
+    # ===== 연도별 화재 데이터 준비 =====
+    yearly_total = df_fire_total.groupby("연도").size()
+    yearly_ev = df_fire_EV.groupby("연도").size()
+    yearly_ratio = (yearly_ev / yearly_total * 100).round(2)
 
-    # ===== Top-N 지역/발화요인 =====
-    st.markdown("### 🏆 Top-5 분석")
-    top_col1, top_col2 = st.columns(2)
-    with top_col1:
-        st.markdown("#### 🔝 화재율 높은 지역")
-        st.table(ev_region.head(5))
-    with top_col2:
-        st.markdown("#### 🔝 주요 발화 요인")
-        st.table(df_fire_EV["발화요인대분류"].value_counts().head(5))
+    # Plotly: 화재 건수 + EV 비율
+    fig_fire = go.Figure()
+    fig_fire.add_trace(go.Bar(x=yearly_total.index, y=yearly_total.values, name="전체 화재 건수", marker_color="lightgray"))
+    fig_fire.add_trace(go.Bar(x=yearly_ev.index, y=yearly_ev.values, name="EV 화재 건수", marker_color="tomato"))
+    fig_fire.add_trace(go.Scatter(x=yearly_ratio.index, y=yearly_ratio.values, name="EV 화재 비율 (%)",
+                                  mode="lines+markers", yaxis="y2", line=dict(color="green", width=2)))
+    fig_fire.update_layout(
+        title="연도별 EV 화재 분석 (전체/EV 건수 + 비율)",
+        xaxis=dict(title="연도"),
+        yaxis=dict(title="화재 건수"),
+        yaxis2=dict(title="EV 화재 비율 (%)", overlaying="y", side="right"),
+        barmode="group", template="plotly_white"
+    )
+    st.plotly_chart(fig_fire, use_container_width=True)
+
+    # ===== 자동차 등록 대수 분석 =====
+    st.markdown("### 🚗 자동차 등록 대수 분석")
+    df_car_info["전기차비율(%)"] = (df_car_info["전기차등록대수"] / df_car_info["전체차량등록대수"] * 100).round(2)
+
+    latest_year = df_car_info["연도"].max()
+    latest_data = df_car_info[df_car_info["연도"] == latest_year].iloc[0]
+
+    # ===== 자동차 등록대수 KPI 카드 표시 =====
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f"""
+        <div class="kpi-card kpi-1">
+            <div class="kpi-title">전체 차량 등록대수</div>
+            <div class="kpi-value">{latest_data['전체차량등록대수']:,} 대</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col2:
+        st.markdown(f"""
+        <div class="kpi-card kpi-2">
+            <div class="kpi-title">전기차 등록대수</div>
+            <div class="kpi-value">{latest_data['전기차등록대수']:,} 대</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col3:
+        st.markdown(f"""
+        <div class="kpi-card kpi-3">
+            <div class="kpi-title">전기차 등록 비율</div>
+            <div class="kpi-value">{latest_data['전기차비율(%)']}%</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Plotly: 등록대수 + EV 비율
+    fig_car = go.Figure()
+    fig_car.add_trace(go.Bar(x=df_car_info["연도"], y=df_car_info["전체차량등록대수"], name="전체 차량 등록대수", marker_color="lightblue"))
+    fig_car.add_trace(go.Bar(x=df_car_info["연도"], y=df_car_info["전기차등록대수"], name="EV 차량 등록대수", marker_color="orange"))
+    fig_car.add_trace(go.Scatter(x=df_car_info["연도"], y=df_car_info["전기차비율(%)"], name="EV 등록 비율 (%)",
+                                 mode="lines+markers", yaxis="y2", line=dict(color="darkblue", width=2)))
+    fig_car.update_layout(
+        title="연도별 자동차 등록대수 및 EV 비율",
+        xaxis=dict(title="연도"),
+        yaxis=dict(title="등록 대수"),
+        yaxis2=dict(title="EV 등록 비율 (%)", overlaying="y", side="right"),
+        barmode="group", template="plotly_white"
+    )
+    st.plotly_chart(fig_car, use_container_width=True)
+
+    # Tab1 분석 인사이트
+    st.markdown("### 📌 분석 인사이트")
+    st.markdown(f"""
+    - 전체 승용차 대비 전기차 화재 비율은 약 **{ev_fire_ratio}%**로 나타났습니다.
+    - 연도별 EV 화재 건수는 지속적으로 증가/변동하고 있으며, 최근 연도는 **{yearly_ev.iloc[-1]} 건**으로 나타납니다.
+    - EV 등록 대수 대비 화재 건수를 고려하면, 증가 추세 및 비율을 모니터링하는 것이 중요합니다.
+    - 정책적 대응, 안전 관리, 충전소 점검 및 차량 관리 강화 필요.
+    """)
+
 
 # ==============================
 # Tab2: 필터 적용 분석
 # ==============================
 with tab2:
-    st.markdown("## 🔥 필터 적용 전기차 화재 분석")
+    st.markdown("### 🔥 전기차 화재 분석 (필터 적용 가능)")
 
-    # 발화요인 대분류
-    col3, col4, col5 = st.columns(3)
+ # ===== KPI 카드 =====
+    filtered_count = len(df_ev_filtered)
+    total_count = len(df_fire_EV)
+    filter_ratio = round(filtered_count / total_count * 100, 2)
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f"""
+        <div class="kpi-card kpi-1">
+            <div class="kpi-title">전체 EV 화재 건수</div>
+            <div class="kpi-value">{total_count:,} 건</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col2:
+        st.markdown(f"""
+        <div class="kpi-card kpi-2">
+            <div class="kpi-title">필터 적용 후 건수</div>
+            <div class="kpi-value">{filtered_count:,} 건</div>
+        </div>
+        """, unsafe_allow_html=True)
+
     with col3:
-        st.markdown("### 발화요인 대분류")
-        fig, ax = plt.subplots(figsize=(6,4))
-        ev_fire_cause_all.plot(kind="bar", ax=ax, color="skyblue")
-        ax.set_ylabel("건수")
-        ax.set_xlabel("발화요인 대분류")
-        ax.set_title("발화요인 대분류별 화재 건수")
-        st.pyplot(fig)
+        st.markdown(f"""
+        <div class="kpi-card kpi-3">
+            <div class="kpi-title">필터 후 비율</div>
+            <div class="kpi-value">{filter_ratio}%</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    # 발화요인 소분류
-    with col4:
-        st.markdown("### 발화요인 소분류")
-        ev_fire_subcause_filtered = df_ev_filtered["발화요인소분류"].value_counts()
-        if not ev_fire_subcause_filtered.empty:
-            fig, ax = plt.subplots(figsize=(6,4))
-            ev_fire_subcause_filtered.plot(kind="bar", ax=ax, color="salmon")
-            ax.set_ylabel("건수")
-            ax.set_xlabel("발화요인 소분류")
-            ax.set_title("발화요인 소분류별 화재 건수")
-            st.pyplot(fig)
-        else:
-            st.write("선택된 필터에 해당하는 데이터가 없습니다.")
+    # ===== 발화요인 대분류 (가로 막대) =====
+    st.markdown("### 🔥 발화요인 대분류별 건수")
+    ev_fire_cause_filtered = df_ev_filtered["발화요인대분류"].value_counts()
 
-    # 차량상태
-    with col5:
-        st.markdown("### 차량상태")
-        fig, ax = plt.subplots(figsize=(6,4))
-        ev_vehicle_status_all.plot(kind="bar", ax=ax, color="lightgreen")
-        ax.set_ylabel("건수")
-        ax.set_xlabel("차량상태")
-        ax.set_title("차량상태별 화재 건수")
-        st.pyplot(fig)
+    fig_cause = go.Figure(go.Bar(
+        x=ev_fire_cause_filtered.values,
+        y=ev_fire_cause_filtered.index,
+        orientation='h',
+        text=ev_fire_cause_filtered.values,
+        textposition='auto',
+        marker_color='tomato'
+    ))
+    fig_cause.update_layout(
+        xaxis_title="건수",
+        yaxis_title="발화요인 대분류",
+        template="plotly_white",
+        height=500
+    )
+    st.plotly_chart(fig_cause, use_container_width=True)
 
-    # 연도별 필터 전/후 비교
-    st.markdown("### 📊 연도별 필터 전 vs 후 화재 건수 비교")
-    total_by_year = df_fire_EV["연도"].value_counts().sort_index()
+    # ===== 발화요인 소분류 (Top 10, 가로 막대) =====
+    st.markdown("### 🔥 발화요인 소분류별 건수 (Top 10)")
+    ev_fire_subcause_filtered = df_ev_filtered["발화요인소분류"].value_counts().head(10)
+
+    if not ev_fire_subcause_filtered.empty:
+        fig_subcause = go.Figure(go.Bar(
+            x=ev_fire_subcause_filtered.values[::-1],
+            y=ev_fire_subcause_filtered.index[::-1],
+            orientation='h',
+            text=ev_fire_subcause_filtered.values[::-1],
+            textposition='auto',
+            marker_color='orange'
+        ))
+        fig_subcause.update_layout(
+            xaxis_title="건수",
+            yaxis_title="발화요인 소분류 (Top 10)",
+            template="plotly_white",
+            height=500
+        )
+        st.plotly_chart(fig_subcause, use_container_width=True)
+    else:
+        st.info("선택된 필터에 해당하는 데이터가 없습니다.")
+
+    # ===== 차량상태 (도넛 차트) =====
+    st.markdown("### 🚗 차량상태별 비율")
+    status_counts = df_ev_filtered["차량상태"].value_counts()
+
+    fig_status = go.Figure(go.Pie(
+        labels=status_counts.index,
+        values=status_counts.values,
+        hole=0.4,  # 도넛
+        textinfo='percent+label'
+    ))
+    fig_status.update_layout(
+        title="차량상태별 비율 (필터 적용)",
+        template="plotly_white",
+        height=400
+    )
+    st.plotly_chart(fig_status, use_container_width=True)
+
+    # ===== 연도별 필터 전/후 비교 =====
+    st.markdown("### 📊 연도별 화재 건수 (필터 전 vs 후)")
+    total_by_year = df_fire_EV["연도"].value_counts().sort_index() 
     filtered_by_year = df_ev_filtered["연도"].value_counts().sort_index()
     compare_df = pd.DataFrame({
-        "연도": total_by_year.index,
-        "필터 전": total_by_year.values,
-        "필터 후": filtered_by_year.reindex(total_by_year.index, fill_value=0).values
+    "연도": total_by_year.index,
+    "필터 전": total_by_year.values,
+    "필터 후": filtered_by_year.reindex(total_by_year.index, fill_value=0).values
     })
-    fig, ax = plt.subplots(figsize=(10,6))
-    compare_df.set_index("연도")[["필터 전","필터 후"]].plot(kind="bar", ax=ax, color=["lightgray","dodgerblue"])
-    ax.set_title("연도별 필터 전/후 화재 건수 비교")
-    ax.set_ylabel("건수")
-    ax.legend(title="구분")
-    st.pyplot(fig)
 
-    # 연도별 전체 대비 필터 후 비율
-    st.markdown("### 📊 연도별 전체 대비 필터 후 비율 (%)")
+    fig_compare = go.Figure()
+    fig_compare.add_trace(go.Bar(
+        x=compare_df["연도"], y=compare_df["필터 전"], name="필터 전", marker_color="lightgray", text=compare_df["필터 전"], textposition='outside'
+    ))
+    fig_compare.add_trace(go.Bar(
+        x=compare_df["연도"], y=compare_df["필터 후"], name="필터 후", marker_color="dodgerblue", text=compare_df["필터 후"], textposition='outside'
+    ))
+    fig_compare.update_layout(
+        barmode='group',
+        title="연도별 필터 전/후 화재 건수 비교",
+        xaxis_title="연도",
+        yaxis_title="건수",
+        template="plotly_white"
+    )
+    st.plotly_chart(fig_compare, use_container_width=True)
+
+    # ===== 연도별 필터 후 비율 (라인 그래프) =====
+    st.markdown("### 📈 연도별 전체 대비 필터 후 비율 (%)")
     ratio_by_year = (compare_df["필터 후"] / compare_df["필터 전"] * 100).round(2)
-    fig, ax = plt.subplots(figsize=(10,6))
-    sns.barplot(x=compare_df["연도"], y=ratio_by_year, palette="Blues_d", ax=ax)
-    for i, v in enumerate(ratio_by_year.values):
-        ax.text(i, v+0.5, f"{v}%", ha="center", fontsize=9)
-    ax.set_title("연도별 전체 대비 필터 후 비율 (%)")
-    ax.set_xlabel("연도")
-    ax.set_ylabel("비율 (%)")
-    st.pyplot(fig)
+    fig_ratio = go.Figure()
+    fig_ratio.add_trace(go.Scatter(
+        x=compare_df["연도"], y=ratio_by_year,
+        mode="lines+markers+text",
+        text=ratio_by_year, textposition="top center",
+        line=dict(color="green", width=2),
+        name="필터 후 비율 (%)"
+    ))
+    fig_ratio.update_layout(
+        title="연도별 전체 대비 필터 후 비율 (%)",
+        xaxis_title="연도",
+        yaxis_title="비율 (%)",
+        template="plotly_white"
+    )
+    st.plotly_chart(fig_ratio, use_container_width=True)
+
+# ==============================
+# Tab3: 지역별 충전소 대비 전기차 화재 비율
+# ==============================
+
+
+with tab3:
+    st.markdown("## 📊 지역별 충전소 1,000대당 전기차 화재 비율 분석")
+
+    # ===== 지역별 EV 화재 건수 & 충전소 수 =====
+    ev_region = df_fire_EV["시도"].value_counts()
+    charger_region = df_charger["시도"].value_counts().reindex(ev_region.index, fill_value=0)
+
+    # ===== 충전소 1000대당 화재 비율 계산 =====
+    fire_per_10000 = (ev_region / charger_region * 10000).round(2)
+    fire_per_10000 = fire_per_10000.replace([float("inf"), float("nan")], 0)
+
+    # ===== KPI 카드 =====
+    avg_ratio = fire_per_10000.mean().round(2)
+    max_region = fire_per_10000.idxmax()
+    max_ratio = fire_per_10000.max()
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f"""
+        <div class="kpi-card kpi-1">
+            <div class="kpi-title">전체 지역 평균 화재율</div>
+            <div class="kpi-value">{avg_ratio}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown(f"""
+        <div class="kpi-card kpi-2">
+            <div class="kpi-title">화재율 최고 지역</div>
+            <div class="kpi-value">{max_region}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col3:
+        st.markdown(f"""
+        <div class="kpi-card kpi-3">
+            <div class="kpi-title">최고 화재율 (1,000대당)</div>
+            <div class="kpi-value">{max_ratio}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # ===== Plotly 막대그래프 =====
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=fire_per_10000.index,
+        y=fire_per_10000.values,
+        text=fire_per_10000.values,
+        textposition='outside',
+        marker_color='tomato',
+        name='화재율'
+    ))
+    fig.update_layout(
+        yaxis_title="충전소 1,000대당 화재 건수",
+        xaxis_title="지역",
+        title="지역별 충전소 1,000대당 전기차 화재 건수",
+        template="plotly_white",
+        uniformtext_minsize=8,
+        uniformtext_mode='hide'
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    # ===== 분석 텍스트 =====
+    st.markdown("### 📌 분석 인사이트")
+    st.markdown(f"""
+    - 평균적으로 충전소 1,000대당 전기차 화재 건수는 **{avg_ratio}** 수준입니다.  
+    - 화재율이 가장 높은 지역은 **{max_region}**으로 **{max_ratio}** 건을 기록했습니다.  
+    - 일부 지역은 충전소 수 대비 화재가 집중되어 있어, 안전 관리 및 예방 정책 강화 필요.  
+    - 이 시각화를 통해 지역별 안전 정책, 충전소 관리, 화재 예방 전략 수립 가능.
+    """)
