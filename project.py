@@ -351,7 +351,7 @@ with tab2:
 
 
 with tab3:
-    st.markdown("## 📊 지역별 충전소 1,0000대당 전기차 화재 비율 분석")
+    st.markdown("### 📊 지역별 충전소 1,0000대당 전기차 화재 비율 분석")
 
     # ===== 지역별 EV 화재 건수 & 충전소 수 =====
     ev_region = df_fire_EV["시도"].value_counts()
