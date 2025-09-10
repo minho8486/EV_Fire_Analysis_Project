@@ -384,7 +384,7 @@ with tab3:
     with col3:
         st.markdown(f"""
         <div class="kpi-card kpi-3">
-            <div class="kpi-title">최고 화재율 (1,000대당)</div>
+            <div class="kpi-title">최고 화재율 (1,0000대당)</div>
             <div class="kpi-value">{max_ratio}</div>
         </div>
         """, unsafe_allow_html=True)
@@ -401,9 +401,9 @@ with tab3:
         name='화재율'
     ))
     fig.update_layout(
-        yaxis_title="충전소 1,000대당 화재 건수",
+        yaxis_title="충전소 1,0000대당 화재 건수",
         xaxis_title="지역",
-        title="지역별 충전소 1,000대당 전기차 화재 건수",
+        title="지역별 충전소 1,0000대당 전기차 화재 건수",
         template="plotly_white",
         uniformtext_minsize=8,
         uniformtext_mode='hide'
@@ -413,7 +413,7 @@ with tab3:
     # ===== 분석 텍스트 =====
     st.markdown("### 📌 분석 인사이트")
     st.markdown(f"""
-    - 평균적으로 충전소 1,000대당 전기차 화재 건수는 **{avg_ratio}** 수준입니다.  
+    - 평균적으로 충전소 1,0000대당 전기차 화재 건수는 **{avg_ratio}** 수준입니다.  
     - 화재율이 가장 높은 지역은 **{max_region}**으로 **{max_ratio}** 건을 기록했습니다.  
     - 일부 지역은 충전소 수 대비 화재가 집중되어 있어, 안전 관리 및 예방 정책 강화 필요.  
     - 이 시각화를 통해 지역별 안전 정책, 충전소 관리, 화재 예방 전략 수립 가능.
