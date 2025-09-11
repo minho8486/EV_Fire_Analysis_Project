@@ -41,8 +41,7 @@ for y in years:
 df_ev_filtered = df_fire_EV[df_fire_EV["연도"].isin(year_filter)].copy()
 
 region_filter = st.sidebar.multiselect("지역 선택", df_fire_EV["시도"].dropna().unique())
-cause_filter  = st.sidebar.multiselect("발화요인 대분류 선택", df_fire_EV["발화요인대분류"].dropna().unique())
-subcause_filter = st.sidebar.multiselect("발화요인 소분류 선택", df_fire_EV["발화요인소분류"].dropna().unique())
+subcause_filter = st.sidebar.multiselect("발화요인 소분류 선택", df_fire_EV["발화요인"].dropna().unique())
 status_filter = st.sidebar.multiselect("차량상태 선택", df_fire_EV["차량상태"].dropna().unique())
 
 # ===== 필터 적용 데이터 =====
@@ -51,8 +50,6 @@ if region_filter:
     df_ev_filtered = df_ev_filtered[df_ev_filtered["시도"].isin(region_filter)]
 if status_filter:
     df_ev_filtered = df_ev_filtered[df_ev_filtered["차량상태"].isin(status_filter)]
-if cause_filter:
-    df_ev_filtered = df_ev_filtered[df_ev_filtered["발화요인대분류"].isin(cause_filter)]
 if subcause_filter:
     df_ev_filtered = df_ev_filtered[df_ev_filtered["발화요인소분류"].isin(subcause_filter)]
 
@@ -356,28 +353,8 @@ with tab2:
         </div>
         """, unsafe_allow_html=True)
 
-    # ===== 발화요인 대분류 (가로 막대) =====
-    st.markdown("### 🔥 발화요인 대분류별 건수")
-    ev_fire_cause_filtered = df_ev_filtered["발화요인대분류"].value_counts()
-
-    fig_cause = go.Figure(go.Bar(
-        x=ev_fire_cause_filtered.values,
-        y=ev_fire_cause_filtered.index,
-        orientation='h',
-        text=ev_fire_cause_filtered.values,
-        textposition='auto',
-        marker_color='tomato'
-    ))
-    fig_cause.update_layout(
-        xaxis_title="건수",
-        yaxis_title="발화요인 대분류",
-        template="plotly_white",
-        height=500
-    )
-    st.plotly_chart(fig_cause, use_container_width=True)
-
     # ===== 발화요인 소분류 (Top 10, 가로 막대) =====
-    st.markdown("### 🔥 발화요인 소분류별 건수 (Top 10)")
+    st.markdown("### 🔥 발화요인 건수 (Top 10)")
     ev_fire_subcause_filtered = df_ev_filtered["발화요인소분류"].value_counts().head(10)
 
     if not ev_fire_subcause_filtered.empty:
