@@ -308,16 +308,16 @@ with tab2:
         </div>
         """, unsafe_allow_html=True)
 
-    # ===== 발화요인 소분류 (Top 10, 가로 막대) =====
+    # ===== 발화요인 소분류 =====
     st.markdown("### 🔥 화재별 발화요인")
     ev_fire_subcause_filtered = df_ev_filtered["발화요인소분류"].value_counts()
 
     if not ev_fire_subcause_filtered.empty:
         fig_subcause = go.Figure(go.Bar(
-            x=ev_fire_subcause_filtered.values[::-1],
-            y=ev_fire_subcause_filtered.index[::-1],
+            x=ev_fire_subcause_filtered.values,
+            y=ev_fire_subcause_filtered.index,
             orientation='h',
-            text=ev_fire_subcause_filtered.values[::-1],
+            text=ev_fire_subcause_filtered.values,
             textposition='auto',
             marker_color='orange'
         ))
@@ -401,14 +401,18 @@ with tab2:
 with tab3:
     st.markdown("### 📍 제조사별 전기차 화재 통계")
 
-    # 제조사별 집계
-    manufacturer_counts = df_car_maker.groupby("제조사").size().reset_index(name="건수")
-    print("\n제조사별 집계:\n", manufacturer_counts)
+# 제조사별 집계 (건수 내림차순)
+manufacturer_counts = df_car_maker.groupby("제조사").size().reset_index(name="건수")
+manufacturer_counts = manufacturer_counts.sort_values(by="건수", ascending=False)
+print("\n제조사별 집계 (건수 내림차순):\n", manufacturer_counts)
 
-    # 최초 발화점별 집계
-    fire_origin_counts = df_car_maker.groupby("최초발화점").size().reset_index(name="건수")
-    print("\n최초 발화점별 집계:\n", fire_origin_counts)
+# 최초 발화점별 집계 (건수 내림차순)
+fire_origin_counts = df_car_maker.groupby("최초발화점").size().reset_index(name="건수")
+fire_origin_counts = fire_origin_counts.sort_values(by="건수", ascending=False)
+print("\n최초 발화점별 집계 (건수 내림차순):\n", fire_origin_counts)
 
-    # 상황별 집계
-    situation_counts = df_car_maker.groupby("상황").size().reset_index(name="건수")
-    print("\n상황별 집계:\n", situation_counts)
+# 상황별 집계 (건수 내림차순)
+situation_counts = df_car_maker.groupby("상황").size().reset_index(name="건수")
+situation_counts = situation_counts.sort_values(by="건수", ascending=False)
+print("\n상황별 집계 (건수 내림차순):\n", situation_counts)
+
