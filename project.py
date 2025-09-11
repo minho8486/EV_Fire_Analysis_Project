@@ -20,7 +20,7 @@ df_charger    = pd.read_csv(charger, encoding="utf-8-sig")
 df_car_info   = pd.read_csv(car_info, encoding="utf-8-sig")
 
 # ===== 전처리 =====
-df_fire_total = df_fire_total[df_fire_total["장소소분류"] == "승용자동차"].copy()
+df_fire_total = df_fire_total[df_fire_total["장소소분류"].isin(["승용자동차", "화물자동차", "버스"])].copy()
 df_fire_total["연도"] = pd.to_datetime(df_fire_total["일시"], errors="coerce").dt.year
 df_fire_EV["연도"] = pd.to_datetime(df_fire_EV["화재발생일"], errors="coerce").dt.year
 
