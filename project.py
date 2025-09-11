@@ -392,8 +392,9 @@ with tab3:
     # ===== 지역별 전기차 화재 그래프 =====
     fig = go.Figure()
     fig.add_trace(go.Bar(
-        x=ev_region.index,
-        y=ev_region.values,
+        x=ev_region.values,
+        y=ev_region.index,
+        orientation="h", 
         text=ev_region.values,
         textposition='outside',
         marker_color='tomato',
@@ -412,8 +413,9 @@ with tab3:
     # ===== 전기차 충전기 그래프 =====
     fig = go.Figure()
     fig.add_trace(go.Bar(
-        x=charger_region.index,
-        y=charger_region.values,
+        x=charger_region.values,
+        y=charger_region.index,
+        orientation="h",
         text=charger_region.values,
         textposition='outside',
         marker_color='tomato',
