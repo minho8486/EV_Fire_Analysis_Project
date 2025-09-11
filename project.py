@@ -407,6 +407,7 @@ with tab3:
         uniformtext_minsize=8,
         uniformtext_mode='hide'
     )
+    st.plotly_chart(fig, use_container_width=True)
 
     # ===== 전기차 충전기 그래프 =====
     fig = go.Figure()
@@ -426,7 +427,7 @@ with tab3:
         uniformtext_minsize=8,
         uniformtext_mode='hide'
     )
-
+    st.plotly_chart(fig, use_container_width=True)
 
     # ===== Plotly 막대그래프 =====
 
