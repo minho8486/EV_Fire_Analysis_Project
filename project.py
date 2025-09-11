@@ -11,13 +11,13 @@ st.set_page_config(layout="wide", page_title="전기차 화재 분석", page_ico
 # ===== 데이터 불러오기 =====
 fire_total = "통합_화재_통계.csv"
 fire_EV    = "전기차_화재_통계.csv"
-charger    = "전국_충전소_데이터.csv"
 car_info   = "자동차_등록_대수_현황.csv"
+car_maker  = "전기차_제조사_데이터.csv"
 
 df_fire_total = pd.read_csv(fire_total, encoding="utf-8-sig")
 df_fire_EV    = pd.read_csv(fire_EV, encoding="utf-8-sig")
-df_charger    = pd.read_csv(charger, encoding="utf-8-sig")
 df_car_info   = pd.read_csv(car_info, encoding="utf-8-sig")
+df_car_maker  = pd.read_csv(car_maker, encoding="utf-8-sig")
 
 # ===== 전처리 =====
 df_fire_total = df_fire_total[df_fire_total["장소소분류"].isin(["승용자동차", "화물자동차", "버스"])].copy()
@@ -399,112 +399,16 @@ with tab2:
 
 
 with tab3:
-    st.markdown("### 📊 지역별 충전소 1,0000대당 전기차 화재 비율 분석")
+    st.markdown("### 📍 제조사별 전기차 화재 통계")
 
-    # ===== 지역별 EV 화재 건수 & 충전소 수 =====
-    ev_region = df_fire_EV["시도"].value_counts()
-    charger_region = df_charger["시도"].value_counts().reindex(ev_region.index, fill_value=0)
+    # 제조사별 집계
+    manufacturer_counts = df_car_maker.groupby("제조사").size().reset_index(name="건수")
+    print("\n제조사별 집계:\n", manufacturer_counts)
 
-    # ===== 충전소 10000대당 화재 비율 계산 =====
-    fire_per_10000 = (ev_region / charger_region * 10000).round(2)
-    fire_per_10000 = fire_per_10000.replace([float("inf"), float("nan")], 0)
+    # 최초 발화점별 집계
+    fire_origin_counts = df_car_maker.groupby("최초발화점").size().reset_index(name="건수")
+    print("\n최초 발화점별 집계:\n", fire_origin_counts)
 
-    # ===== KPI 카드 =====
-    avg_ratio = fire_per_10000.mean().round(2)
-    max_region = fire_per_10000.idxmax()
-    max_ratio = fire_per_10000.max()
-
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown(f"""
-        <div class="kpi-card kpi-1">
-            <div class="kpi-title">전체 지역 평균 화재율</div>
-            <div class="kpi-value">{avg_ratio}</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with col2:
-        st.markdown(f"""
-        <div class="kpi-card kpi-2">
-            <div class="kpi-title">화재율 최고 지역</div>
-            <div class="kpi-value">{max_region}</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with col3:
-        st.markdown(f"""
-        <div class="kpi-card kpi-3">
-            <div class="kpi-title">최고 화재율 (1,0000대당)</div>
-            <div class="kpi-value">{max_ratio}</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    # ===== 지역별 전기차 화재 그래프 =====
-    fig = go.Figure()
-    fig.add_trace(go.Bar(
-        x=ev_region.values,
-        y=ev_region.index,
-        orientation="h", 
-        text=ev_region.values,
-        textposition='outside',
-        marker_color='royalblue',
-        name='지역별 전기차 화재'
-    ))
-    fig.update_layout(
-        yaxis_title="지역",
-        xaxis_title="지역별 전기차 화재 수",
-        title="지역별 전기차 화재 수",
-        template="plotly_white",
-        uniformtext_minsize=8,
-        uniformtext_mode='hide'
-    )
-    st.plotly_chart(fig, use_container_width=True)
-
-    # ===== 전기차 충전기 그래프 =====
-    fig = go.Figure()
-    fig.add_trace(go.Bar(
-        x=charger_region.values,
-        y=charger_region.index,
-        orientation="h",
-        text=charger_region.values,
-        textposition='outside',
-        marker_color='forestgreen',
-        name='지역별 전기차 충전기'
-    ))
-    fig.update_layout(
-        yaxis_title="지역",
-        xaxis_title="지역별 전기차 충전기 수",
-        title="지역별 전기차 충전기 수",
-        template="plotly_white",
-        uniformtext_minsize=8,
-        uniformtext_mode='hide'
-    )
-    st.plotly_chart(fig, use_container_width=True)
-
-    # ===== Plotly 막대그래프 =====
-
-    fig = go.Figure()
-    fig.add_trace(go.Bar(
-        x=fire_per_10000.index,
-        y=fire_per_10000.values,
-        text=fire_per_10000.values,
-        textposition='outside',
-        marker_color='tomato',
-        name='화재율'
-    ))
-    fig.update_layout(
-        yaxis_title="충전소 1,0000대당 화재 건수",
-        xaxis_title="지역",
-        title="지역별 충전소 1,0000대당 전기차 화재 건수",
-        template="plotly_white",
-        uniformtext_minsize=8,
-        uniformtext_mode='hide'
-    )
-    st.plotly_chart(fig, use_container_width=True)
-
-    # ===== 분석 텍스트 =====
-    st.markdown("### 📌 분석 인사이트")
-    st.markdown(f"""
-    - 평균적으로 충전소 1,0000대당 전기차 화재 건수는 **{avg_ratio}** 수준입니다.  
-    - 화재율이 가장 높은 지역은 **{max_region}**으로 **{max_ratio}** 건을 기록했습니다.  
-    - 일부 지역은 충전소 수 대비 화재가 집중되어 있어, 안전 관리 및 예방 정책 강화 필요.  
-    - 이 시각화를 통해 지역별 안전 정책, 충전소 관리, 화재 예방 전략 수립 가능.
-    """)
+    # 상황별 집계
+    situation_counts = df_car_maker.groupby("상황").size().reset_index(name="건수")
+    print("\n상황별 집계:\n", situation_counts)
