@@ -198,6 +198,73 @@ with tab1:
     )
     st.plotly_chart(fig_car, use_container_width=True)
 
+    # 연도별 등록대수, 화재건수
+    df_car_info = df_car_info.set_index("연도")
+
+    # 전기차 등록대수 & 화재건수
+    ev_registered = df_car_info["전기차등록대수"]
+    ev_fire_by_year = df_fire_EV.groupby("연도").size()
+
+    # 내연기관 등록대수 & 화재건수
+    ice_registered = df_car_info["전체차량등록대수"] - ev_registered
+    ice_fire_by_year = df_fire_total.groupby("연도").size() - ev_fire_by_year
+
+    # 10만대당 화재 건수 계산
+    ev_fire_per_100k = (ev_fire_by_year / ev_registered * 100000).round(2)
+    ice_fire_per_100k = (ice_fire_by_year / ice_registered * 100000).round(2)
+
+    # 전기차 시각화
+    fig_ev = go.Figure()
+    fig_ev.add_trace(go.Bar(
+        x=ev_registered.index,
+        y=ev_registered.values,
+        name="EV 등록대수",
+        marker_color="royalblue",
+        yaxis="y1"
+    ))
+    fig_ev.add_trace(go.Scatter(
+        x=ev_fire_per_100k.index,
+        y=ev_fire_per_100k.values,
+        name="EV 화재 (10만대당 건수)",
+        mode="lines+markers",
+        marker_color="tomato",
+        yaxis="y2"
+    ))
+    fig_ev.update_layout(
+        title="연도별 전기차 등록대수 & 10만대당 화재 건수",
+        xaxis_title="연도",
+        yaxis=dict(title="EV 등록대수", side="left"),
+        yaxis2=dict(title="10만대당 화재 건수", overlaying="y", side="right"),
+        template="plotly_white"
+    )
+    st.plotly_chart(fig_ev, use_container_width=True)
+
+    # 내연기관 시각화
+    fig_ice = go.Figure()
+    fig_ice.add_trace(go.Bar(
+        x=ice_registered.index,
+        y=ice_registered.values,
+        name="내연기관 등록대수",
+        marker_color="seagreen",
+        yaxis="y1"
+    ))
+    fig_ice.add_trace(go.Scatter(
+        x=ice_fire_per_100k.index,
+        y=ice_fire_per_100k.values,
+        name="내연기관 화재 (10만대당 건수)",
+        mode="lines+markers",
+        marker_color="orange",
+        yaxis="y2"
+    ))
+    fig_ice.update_layout(
+        title="연도별 내연기관 등록대수 & 10만대당 화재 건수",
+        xaxis_title="연도",
+        yaxis=dict(title="내연기관 등록대수", side="left"),
+        yaxis2=dict(title="10만대당 화재 건수", overlaying="y", side="right"),
+        template="plotly_white"
+    )
+    st.plotly_chart(fig_ice, use_container_width=True)
+
     # Tab1 분석 인사이트
     st.markdown("### 📌 분석 인사이트")
     st.markdown(f"""
