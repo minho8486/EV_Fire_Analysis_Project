@@ -222,7 +222,7 @@ with tab1:
     st.plotly_chart(fig_car, use_container_width=True)
 
     # 전기차 등록대수 상승률
-    ev_registered_growth = df_car_info["전기차등록대수"].pct_change().fillna(0) * 100
+    ev_registered_growth = round(df_car_info["전기차등록대수"].pct_change().fillna(0) * 100, 2)
 
     fig_growth_car = go.Figure()
     fig_growth_car.add_trace(go.Bar(
