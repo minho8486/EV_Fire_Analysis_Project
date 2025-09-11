@@ -12,7 +12,7 @@ st.set_page_config(layout="wide", page_title="전기차 화재 분석", page_ico
 fire_total = "통합_화재_통계.csv"
 fire_EV    = "전기차_화재_통계.csv"
 car_info   = "자동차_등록_대수_현황.csv"
-car_maker  = "전기차_제조사_데이터.csv"
+car_maker  = "차종별_화재_통계.csv"
 
 df_fire_total = pd.read_csv(fire_total, encoding="utf-8-sig")
 df_fire_EV    = pd.read_csv(fire_EV, encoding="utf-8-sig")
