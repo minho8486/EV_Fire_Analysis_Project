@@ -41,7 +41,7 @@ for y in years:
 df_ev_filtered = df_fire_EV[df_fire_EV["연도"].isin(year_filter)].copy()
 
 region_filter = st.sidebar.multiselect("지역 선택", df_fire_EV["시도"].dropna().unique())
-subcause_filter = st.sidebar.multiselect("발화요인 소분류 선택", df_fire_EV["발화요인"].dropna().unique())
+subcause_filter = st.sidebar.multiselect("발화요인 선택", df_fire_EV["발화요인소분류"].dropna().unique())
 status_filter = st.sidebar.multiselect("차량상태 선택", df_fire_EV["차량상태"].dropna().unique())
 
 # ===== 필터 적용 데이터 =====
