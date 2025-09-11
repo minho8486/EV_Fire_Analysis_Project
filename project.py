@@ -25,18 +25,21 @@ df_fire_total["연도"] = pd.to_datetime(df_fire_total["일시"], errors="coerce
 df_fire_EV["연도"] = pd.to_datetime(df_fire_EV["화재발생일"], errors="coerce").dt.year
 
 # ===== Sidebar 필터 =====
-st.sidebar.header("필터")
-show_all_years = st.sidebar.checkbox("전체 데이터 보기", value=True)
-if show_all_years:
-    year_filter = sorted(df_fire_EV["연도"].dropna().unique())
-else:
-    year_filter = st.sidebar.multiselect(
-        "연도 선택",
-        options=sorted(df_fire_EV["연도"].dropna().unique()),
-        default=sorted(df_fire_EV["연도"].dropna().unique())
-    )
-
 st.sidebar.header("필터링 분석 옵션 (tab2)")
+
+st.sidebar.write("연도 선택")
+# 유니크 연도 가져오기
+years = sorted(df_fire_EV["연도"].dropna().unique())
+
+# 체크박스로 선택된 연도 모으기
+year_filter = []
+for y in years:
+    if st.sidebar.checkbox(f"{y}년", value=True):  # 기본값 True로 모두 선택
+        year_filter.append(y)
+
+# 선택된 연도로 데이터 필터링
+df_ev_filtered = df_fire_EV[df_fire_EV["연도"].isin(year_filter)].copy()
+
 region_filter = st.sidebar.multiselect("지역 선택", df_fire_EV["시도"].dropna().unique())
 status_filter = st.sidebar.multiselect("차량상태 선택", df_fire_EV["차량상태"].dropna().unique())
 cause_filter  = st.sidebar.multiselect("발화요인 대분류 선택", df_fire_EV["발화요인대분류"].dropna().unique())
