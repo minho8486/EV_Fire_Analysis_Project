@@ -144,29 +144,6 @@ with tab1:
     )
     st.plotly_chart(fig_fire, use_container_width=True)
 
-    # 전기차 화재 건수 상승률
-    ev_fire_growth = yearly_ev.pct_change().fillna(0) * 100
-    ev_fire_growth = ev_fire_growth.round(2)
-
-    # ===== Plotly: EV 화재 상승률 =====
-    fig_growth_ev = go.Figure()
-    fig_growth_ev.add_trace(go.Bar(
-        x=ev_fire_growth.index,
-        y=ev_fire_growth.values,
-        text=ev_fire_growth.values,
-        textposition='outside',
-        marker_color='tomato',
-        name='EV 화재 상승률 (%)'
-    ))
-    fig_growth_ev.update_layout(
-        title="연도별 전기차 화재 상승률",
-        xaxis_title="연도",
-        yaxis_title="상승률 (%)",
-        template="plotly_white"
-    )
-    st.plotly_chart(fig_growth_ev, use_container_width=True)
-
-
     # ===== 자동차 등록 대수 분석 =====
     st.markdown("### 🚗 자동차 등록 대수 분석")
     df_car_info["전기차비율(%)"] = (df_car_info["전기차등록대수"] / df_car_info["전체차량등록대수"] * 100).round(2)
@@ -214,27 +191,6 @@ with tab1:
         barmode="group", template="plotly_white"
     )
     st.plotly_chart(fig_car, use_container_width=True)
-
-    # 전기차 등록대수 상승률
-    ev_registered_growth = round(df_car_info["전기차등록대수"].pct_change().fillna(0) * 100, 2)
-
-    fig_growth_car = go.Figure()
-    fig_growth_car.add_trace(go.Bar(
-        x=ev_registered_growth.index,
-        y=ev_registered_growth.values,
-        name="전기차 등록대수 상승률 (%)",
-        marker_color="orange",
-        text=ev_registered_growth.values,
-        textposition='outside'
-    ))
-    fig_growth_car.update_layout(
-        barmode="group",
-        title="연도별 전기차 등록대수 상승률",
-        xaxis_title="연도",
-        yaxis_title="상승률 (%)",
-        template="plotly_white"
-    )
-    st.plotly_chart(fig_growth_car, use_container_width=True)
 
     # 연도별 등록대수, 화재건수
     df_car_info = df_car_info.set_index("연도")
@@ -329,7 +285,7 @@ with tab2:
     with col1:
         st.markdown(f"""
         <div class="kpi-card kpi-1">
-            <div class="kpi-title">전체 EV 화재 건수</div>
+            <div class="kpi-title">전기차 총 화재 건수</div>
             <div class="kpi-value">{total_count:,} 건</div>
         </div>
         """, unsafe_allow_html=True)
@@ -345,14 +301,14 @@ with tab2:
     with col3:
         st.markdown(f"""
         <div class="kpi-card kpi-3">
-            <div class="kpi-title">필터 후 비율</div>
+            <div class="kpi-title">필터데이터/전체 비율</div>
             <div class="kpi-value">{filter_ratio}%</div>
         </div>
         """, unsafe_allow_html=True)
 
     # ===== 발화요인 소분류 (Top 10, 가로 막대) =====
-    st.markdown("### 🔥 발화요인 건수 (Top 10)")
-    ev_fire_subcause_filtered = df_ev_filtered["발화요인소분류"].value_counts().head(10)
+    st.markdown("### 🔥 화재 발화요인 량")
+    ev_fire_subcause_filtered = df_ev_filtered["발화요인소분류"].value_counts()
 
     if not ev_fire_subcause_filtered.empty:
         fig_subcause = go.Figure(go.Bar(
@@ -364,8 +320,8 @@ with tab2:
             marker_color='orange'
         ))
         fig_subcause.update_layout(
-            xaxis_title="건수",
-            yaxis_title="발화요인 소분류 (Top 10)",
+            xaxis_title="총량",
+            yaxis_title="발화요인",
             template="plotly_white",
             height=500
         )
@@ -417,7 +373,7 @@ with tab2:
     st.plotly_chart(fig_compare, use_container_width=True)
 
     # ===== 연도별 필터 후 비율 (라인 그래프) =====
-    st.markdown("### 📈 연도별 전체 대비 필터 후 비율 (%)")
+    st.markdown("### 📈 연도별 필터 후/전체 비율 (%)")
     ratio_by_year = (compare_df["필터 후"] / compare_df["필터 전"] * 100).round(2)
     fig_ratio = go.Figure()
     fig_ratio.add_trace(go.Scatter(
