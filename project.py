@@ -198,44 +198,92 @@ with tab1:
     )
     st.plotly_chart(fig_car, use_container_width=True)
 
-    # ===== 내연기관 화재 비율 데이터프레임 =====
-    latest_year = df_car_info["연도"].max()
-    latest_car_info = df_car_info[df_car_info["연도"] == latest_year].iloc[0]
+    # ===== 내연기관 화재 비율 데이터준비 =====
+    # 연도별 전체 화재 건수
+    total_fire_by_year = df_fire_total.groupby("연도").size()
+    # 연도별 EV 화재 건수
+    ev_fire_by_year = df_fire_EV.groupby("연도").size()
+    # 연도별 내연기관 화재 건수
+    ice_fire_by_year = total_fire_by_year - ev_fire_by_year
 
-    total_vehicles = latest_car_info["전체차량등록대수"]
-    ev_vehicles = latest_car_info["전기차등록대수"]
-    ice_vehicles = total_vehicles - ev_vehicles
-    ice_fire_count = total_fire_count - ev_fire_count
-    ice_fire_ratio = round(ice_fire_count / ice_vehicles * 100, 2)
+    # 연도별 등록대수
+    ev_registered = df_car_info.set_index("연도")["전기차등록대수"]
+    ice_registered = df_car_info.set_index("연도")["전체차량등록대수"] - ev_registered
 
-    df_ratio = pd.DataFrame({
-        "EV 화재 비율(%)": ev_fire_ratio,
-        "내연기관 화재 비율(%)": ice_fire_ratio
-    }).round(2)
+    # 화재 비율 계산
+    ev_fire_ratio = (ev_fire_by_year / ev_registered * 100).round(2)
+    ice_fire_ratio = (ice_fire_by_year / ice_registered * 100).round(2)
 
     # ===== 전체 차량 대비 화재 비율 =====
-    st.markdown("### 📊 전체 차량 대비 화재 비율")
-    fig_ice_ev_fire = go.Figure()
-    fig_ice_ev_fire.add_trace(go.Bar(
-        x=df_ratio.index,
-        y=df_ratio["EV 화재 비율(%)"],
-        name="EV 화재 비율(%)",
+    
+    # 연간 전기차 등록수 대비 화재 비율
+    fig_ev = go.Figure()
+    fig_ev.add_trace(go.Bar(
+        x=ev_registered.index,
+        y=ev_registered.values,
+        name="EV 등록대수",
+        marker_color="orange"
+    ))
+    fig_ev.add_trace(go.Bar(
+        x=ev_fire_by_year.index,
+        y=ev_fire_by_year.values,
+        name="EV 화재 건수",
         marker_color="tomato"
     ))
-    fig_ice_ev_fire.add_trace(go.Bar(
-        x=df_ratio.index,
-        y=df_ratio["내연기관 화재 비율(%)"],
-        name="내연기관 화재 비율(%)",
-        marker_color="skyblue"
+    fig_ev.add_trace(go.Scatter(
+        x=ev_fire_ratio.index,
+        y=ev_fire_ratio.values,
+        name="EV 화재 비율 (%)",
+        mode="lines+markers",
+        line=dict(color="green", width=2),
+        yaxis="y2"
     ))
-    fig_ice_ev_fire.update_layout(
-        barmode="group",
-        title="연도별 내연기관 vs 전기차 화재 비율",
+    fig_ev.update_layout(
+        title="연도별 전기차 등록대수 및 화재 건수와 비율",
         xaxis_title="연도",
-        yaxis_title="화재 비율 (%)",
+        yaxis=dict(title="대수 / 건수"),
+        yaxis2=dict(title="화재 비율 (%)", overlaying="y", side="right"),
+        barmode="group",
         template="plotly_white"
     )
-    st.plotly_chart(fig_ice_ev_fire, use_container_width=True)
+
+    # 연간 내연기관 등록수 대비 화재 비율
+    fig_ice = go.Figure()
+    fig_ice.add_trace(go.Bar(
+        x=ice_registered.index,
+        y=ice_registered.values,
+        name="내연기관 등록대수",
+        marker_color="lightblue"
+    ))
+    fig_ice.add_trace(go.Bar(
+        x=ice_fire_by_year.index,
+        y=ice_fire_by_year.values,
+        name="내연기관 화재 건수",
+        marker_color="blue"
+    ))
+    fig_ice.add_trace(go.Scatter(
+        x=ice_fire_ratio.index,
+        y=ice_fire_ratio.values,
+        name="내연기관 화재 비율 (%)",
+        mode="lines+markers",
+        line=dict(color="darkblue", width=2),
+        yaxis="y2"
+    ))
+    fig_ice.update_layout(
+        title="연도별 내연기관 등록대수 및 화재 건수와 비율",
+        xaxis_title="연도",
+        yaxis=dict(title="대수 / 건수"),
+        yaxis2=dict(title="화재 비율 (%)", overlaying="y", side="right"),
+        barmode="group",
+        template="plotly_white"
+    )
+
+    st.markdown("### 📊 연도별 전기차 화재/등록대수 비율")
+    st.plotly_chart(fig_ev, use_container_width=True)
+
+    st.markdown("### 📊 연도별 내연기관 화재/등록대수 비율")
+    st.plotly_chart(fig_ice, use_container_width=True)
+
 
     # Tab1 분석 인사이트
     st.markdown("### 📌 분석 인사이트")
