@@ -310,8 +310,8 @@ with tab2:
 
     # ===== 발화요인 소분류 =====
     st.markdown("### 🔥 화재별 발화요인")
-    ev_fire_subcause_filtered = df_ev_filtered["발화요인소분류"].value_counts()
 
+    ev_fire_subcause_filtered = df_ev_filtered["발화요인소분류"].value_counts().sort_values(ascending=True)
     if not ev_fire_subcause_filtered.empty:
         fig_subcause = go.Figure(go.Bar(
             x=ev_fire_subcause_filtered.values,
@@ -325,7 +325,7 @@ with tab2:
             xaxis_title="총량",
             yaxis_title="발화요인",
             template="plotly_white",
-            height=500
+            height=600
         )
         st.plotly_chart(fig_subcause, use_container_width=True)
     else:
