@@ -36,6 +36,7 @@ else:
         default=sorted(df_fire_EV["연도"].dropna().unique())
     )
 
+st.sidebar.header("필터링 분석 옵션 (tab2)")
 region_filter = st.sidebar.multiselect("지역 선택", df_fire_EV["시도"].dropna().unique())
 status_filter = st.sidebar.multiselect("차량상태 선택", df_fire_EV["차량상태"].dropna().unique())
 cause_filter  = st.sidebar.multiselect("발화요인 대분류 선택", df_fire_EV["발화요인대분류"].dropna().unique())
