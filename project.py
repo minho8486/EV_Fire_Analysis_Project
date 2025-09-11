@@ -41,9 +41,9 @@ for y in years:
 df_ev_filtered = df_fire_EV[df_fire_EV["연도"].isin(year_filter)].copy()
 
 region_filter = st.sidebar.multiselect("지역 선택", df_fire_EV["시도"].dropna().unique())
-status_filter = st.sidebar.multiselect("차량상태 선택", df_fire_EV["차량상태"].dropna().unique())
 cause_filter  = st.sidebar.multiselect("발화요인 대분류 선택", df_fire_EV["발화요인대분류"].dropna().unique())
 subcause_filter = st.sidebar.multiselect("발화요인 소분류 선택", df_fire_EV["발화요인소분류"].dropna().unique())
+status_filter = st.sidebar.multiselect("차량상태 선택", df_fire_EV["차량상태"].dropna().unique())
 
 # ===== 필터 적용 데이터 =====
 df_ev_filtered = df_fire_EV[df_fire_EV["연도"].isin(year_filter)].copy()
@@ -197,6 +197,48 @@ with tab1:
         barmode="group", template="plotly_white"
     )
     st.plotly_chart(fig_car, use_container_width=True)
+
+    # ===== 내연기관 화재 비율 데이터프레임 =====
+    latest_year = df_car_info["연도"].max()
+    latest_car_info = df_car_info[df_car_info["연도"] == latest_year].iloc[0]
+
+    total_vehicles = latest_car_info["전체차량등록대수"]
+    ev_vehicles = latest_car_info["전기차등록대수"]
+    ice_vehicles = total_vehicles - ev_vehicles
+    ice_fire_count = total_fire_count - ev_fire_count
+    ice_fire_ratio = round(ice_fire_count / ice_vehicles * 100, 2)
+
+    df_ratio = pd.DataFrame({
+        "EV 화재 비율(%)": ev_fire_ratio,
+        "내연기관 화재 비율(%)": ice_fire_ratio
+    }).round(2)
+
+    # ===== 전체 차량 대비 화재 비율 =====
+    st.markdown("### 📊 전체 차량 대비 화재 비율")
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=df_ratio.index,
+        y=df_ratio["EV 화재 비율(%)"],
+        name="EV 화재 비율(%)",
+        marker_color="tomato"
+    ))
+
+    fig.add_trace(go.Bar(
+        x=df_ratio.index,
+        y=df_ratio["내연기관 화재 비율(%)"],
+        name="내연기관 화재 비율(%)",
+        marker_color="skyblue"
+    ))
+
+    fig.update_layout(
+        barmode="group",
+        title="연도별 내연기관 vs 전기차 화재 비율",
+        xaxis_title="연도",
+        yaxis_title="화재 비율 (%)",
+        template="plotly_white"
+    )
+
+    fig.show()
 
     # Tab1 분석 인사이트
     st.markdown("### 📌 분석 인사이트")
