@@ -389,6 +389,45 @@ with tab3:
         </div>
         """, unsafe_allow_html=True)
 
+    # ===== 지역별 전기차 화재 그래프 =====
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=ev_region.values,
+        y=ev_region.index,
+        text=ev_region.values,
+        textposition='outside',
+        marker_color='tomato',
+        name='지역별 전기차 화재'
+    ))
+    fig.update_layout(
+        yaxis_title="지역",
+        xaxis_title="지역별 전기차 화재 수",
+        title="지역별 전기차 화재 수",
+        template="plotly_white",
+        uniformtext_minsize=8,
+        uniformtext_mode='hide'
+    )
+
+    # ===== 전기차 충전기 그래프 =====
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=charger_region.values,
+        y=charger_region.index,
+        text=charger_region.values,
+        textposition='outside',
+        marker_color='tomato',
+        name='지역별 전기차 충전기'
+    ))
+    fig.update_layout(
+        yaxis_title="지역",
+        xaxis_title="지역별 전기차 충전기 수",
+        title="지역별 전기차 충전기 수",
+        template="plotly_white",
+        uniformtext_minsize=8,
+        uniformtext_mode='hide'
+    )
+
+
     # ===== Plotly 막대그래프 =====
 
     fig = go.Figure()
