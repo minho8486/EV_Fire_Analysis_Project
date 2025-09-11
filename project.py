@@ -192,6 +192,8 @@ with tab1:
     )
     st.plotly_chart(fig_car, use_container_width=True)
 
+    st.markdown("### 🔥 10만대당 화재 건수 비교")
+
     # 연도별 등록대수, 화재건수
     df_car_info = df_car_info.set_index("연도")
 
@@ -307,7 +309,7 @@ with tab2:
         """, unsafe_allow_html=True)
 
     # ===== 발화요인 소분류 (Top 10, 가로 막대) =====
-    st.markdown("### 🔥 화재 발화요인 량")
+    st.markdown("### 🔥 화재별 발화요인")
     ev_fire_subcause_filtered = df_ev_filtered["발화요인소분류"].value_counts()
 
     if not ev_fire_subcause_filtered.empty:
