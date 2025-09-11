@@ -222,6 +222,13 @@ with tab1:
         marker_color="royalblue",
         yaxis="y1"
     ))
+    fig_ev.add_trace(go.Bar(
+        x=ev_fire_by_year.index,
+        y=ev_fire_by_year.values,
+        name="EV 화재건수",
+        marker_color="lightcoral",
+        yaxis="y1"
+    ))
     fig_ev.add_trace(go.Scatter(
         x=ev_fire_per_100k.index,
         y=ev_fire_per_100k.values,
@@ -246,6 +253,13 @@ with tab1:
         y=ice_registered.values,
         name="내연기관 등록대수",
         marker_color="seagreen",
+        yaxis="y1"
+    ))
+    fig_ice.add_trace(go.Bar(
+        x=ice_fire_by_year.index,
+        y=ice_fire_by_year.values,
+        name="내연기관 화재건수",
+        marker_color="goldenrod",
         yaxis="y1"
     ))
     fig_ice.add_trace(go.Scatter(
