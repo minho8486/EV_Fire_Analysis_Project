@@ -397,7 +397,7 @@ with tab3:
         orientation="h", 
         text=ev_region.values,
         textposition='outside',
-        marker_color='viridis',
+        marker_color='royalblue',
         name='지역별 전기차 화재'
     ))
     fig.update_layout(
@@ -418,7 +418,7 @@ with tab3:
         orientation="h",
         text=charger_region.values,
         textposition='outside',
-        marker_color='cividis',
+        marker_color='forestgreen',
         name='지역별 전기차 충전기'
     ))
     fig.update_layout(
