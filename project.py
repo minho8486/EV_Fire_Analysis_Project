@@ -175,6 +175,7 @@ with tab1:
 
     # ===== 자동차 등록 대수 분석 =====
     st.markdown("### 🚗 자동차 등록 대수 분석")
+    
     df_car_info["전기차비율(%)"] = (df_car_info["전기차등록대수"] / df_car_info["전체차량등록대수"] * 100).round(2)
 
     latest_year = df_car_info["연도"].max()
@@ -208,9 +209,9 @@ with tab1:
 
     # Plotly: 등록대수 + EV 비율
     fig_car = go.Figure()
-    fig_car.add_trace(go.Bar(x=df_car_info["연도"], y=df_car_info["전체차량등록대수"], name="전체 차량 등록대수", marker_color="lightblue"))
-    fig_car.add_trace(go.Bar(x=df_car_info["연도"], y=df_car_info["전기차등록대수"], name="EV 차량 등록대수", marker_color="orange"))
-    fig_car.add_trace(go.Scatter(x=df_car_info["연도"], y=df_car_info["전기차비율(%)"], name="EV 등록 비율 (%)",
+    fig_car.add_trace(go.Bar(x=df_car_info["연도"] != 2020, y=df_car_info["전체차량등록대수"], name="전체 차량 등록대수", marker_color="lightblue"))
+    fig_car.add_trace(go.Bar(x=df_car_info["연도"] != 2020, y=df_car_info["전기차등록대수"], name="EV 차량 등록대수", marker_color="orange"))
+    fig_car.add_trace(go.Scatter(x=df_car_info["연도"] != 2020, y=df_car_info["전기차비율(%)"], name="EV 등록 비율 (%)",
                                  mode="lines+markers", yaxis="y2", line=dict(color="darkblue", width=2)))
     fig_car.update_layout(
         title="연도별 자동차 등록대수 및 EV 비율",
