@@ -150,6 +150,29 @@ with tab1:
     )
     st.plotly_chart(fig_fire, use_container_width=True)
 
+    # 전기차 화재 건수 상승률
+    ev_fire_growth = yearly_ev.pct_change().fillna(0) * 100
+    ev_fire_growth = ev_fire_growth.round(2)
+
+    # ===== Plotly: EV 화재 상승률 =====
+    fig_growth_ev = go.Figure()
+    fig_growth_ev.add_trace(go.Bar(
+        x=ev_fire_growth.index,
+        y=ev_fire_growth.values,
+        text=ev_fire_growth.values,
+        textposition='outside',
+        marker_color='tomato',
+        name='EV 화재 상승률 (%)'
+    ))
+    fig_growth_ev.update_layout(
+        title="연도별 전기차 화재 상승률",
+        xaxis_title="연도",
+        yaxis_title="상승률 (%)",
+        template="plotly_white"
+    )
+    st.plotly_chart(fig_growth_ev, use_container_width=True)
+
+
     # ===== 자동차 등록 대수 분석 =====
     st.markdown("### 🚗 자동차 등록 대수 분석")
     df_car_info["전기차비율(%)"] = (df_car_info["전기차등록대수"] / df_car_info["전체차량등록대수"] * 100).round(2)
@@ -197,6 +220,27 @@ with tab1:
         barmode="group", template="plotly_white"
     )
     st.plotly_chart(fig_car, use_container_width=True)
+
+    # 전기차 등록대수 상승률
+    ev_registered_growth = df_car_info["전기차등록대수"].pct_change().fillna(0) * 100
+
+    fig_growth_car = go.Figure()
+    fig_growth_car.add_trace(go.Bar(
+        x=ev_registered_growth.index,
+        y=ev_registered_growth.values,
+        name="전기차 등록대수 상승률 (%)",
+        marker_color="orange",
+        text=ev_registered_growth.values,
+        textposition='outside'
+    ))
+    fig_growth_car.update_layout(
+        barmode="group",
+        title="연도별 전기차 등록대수 상승률",
+        xaxis_title="연도",
+        yaxis_title="상승률 (%)",
+        template="plotly_white"
+    )
+    st.plotly_chart(fig_growth_car, use_container_width=True)
 
     # 연도별 등록대수, 화재건수
     df_car_info = df_car_info.set_index("연도")
