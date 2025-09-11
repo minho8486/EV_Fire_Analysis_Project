@@ -215,30 +215,27 @@ with tab1:
 
     # ===== 전체 차량 대비 화재 비율 =====
     st.markdown("### 📊 전체 차량 대비 화재 비율")
-    fig = go.Figure()
-    fig.add_trace(go.Bar(
+    fig_ice_ev_fire = go.Figure()
+    fig_ice_ev_fire.add_trace(go.Bar(
         x=df_ratio.index,
         y=df_ratio["EV 화재 비율(%)"],
         name="EV 화재 비율(%)",
         marker_color="tomato"
     ))
-
-    fig.add_trace(go.Bar(
+    fig_ice_ev_fire.add_trace(go.Bar(
         x=df_ratio.index,
         y=df_ratio["내연기관 화재 비율(%)"],
         name="내연기관 화재 비율(%)",
         marker_color="skyblue"
     ))
-
-    fig.update_layout(
+    fig_ice_ev_fire.update_layout(
         barmode="group",
         title="연도별 내연기관 vs 전기차 화재 비율",
         xaxis_title="연도",
         yaxis_title="화재 비율 (%)",
         template="plotly_white"
     )
-
-    fig.show()
+    st.plotly_chart(fig_ice_ev_fire, use_container_width=True)
 
     # Tab1 분석 인사이트
     st.markdown("### 📌 분석 인사이트")
