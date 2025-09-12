@@ -401,20 +401,13 @@ with tab2:
 with tab3:
     st.markdown("### 🔥 제조사별 전기차 화재 통계")
 
-    # 제조사별 집계 (건수 내림차순)
-    manufacturer_counts = df_car_maker.groupby("제조사").size().reset_index(name="건수")
-    manufacturer_counts = manufacturer_counts.sort_values(by="건수", ascending=False)
-
-    # 최초 발화점별 집계 (건수 내림차순)
-    fire_origin_counts = df_car_maker.groupby("최초발화점").size().reset_index(name="건수")
-    fire_origin_counts = fire_origin_counts.sort_values(by="건수", ascending=False)
-
-    # 상황별 집계 (건수 내림차순)
-    situation_counts = df_car_maker.groupby("상황").size().reset_index(name="건수")
-    situation_counts = situation_counts.sort_values(by="건수", ascending=False)
+    # 시각화용 데이터
+    manufacturer_counts = df_car_maker["제조사"].value_counts()
+    fire_origin_counts = df_car_maker["최초발화점"].value_counts()
+    situation_counts = df_car_maker["상황"].value_counts()
 
     total_counts = len(df_car_maker)
-    filtered_df = df_car_maker[(df_car_maker["최초발화점"] == "배터리") & (df_car_maker["상황"] != "주행중(충돌)")]
+    filtered_df = df_car_maker[(df_car_maker["최초발화점"] == "고전압배터리") & (df_car_maker["상황"] != "주행중(충돌)")]
     filter_count = len(filtered_df)
     filter_m_ratio = round(filter_count / total_counts * 100, 2)
 
@@ -424,7 +417,6 @@ with tab3:
     fig_subcause = go.Figure(go.Bar(
         x=manufacturer_counts.values,
         y=manufacturer_counts.index,
-        orientation='h',
         text=manufacturer_counts.values,
         textposition='auto',
         marker_color='orange'
@@ -439,8 +431,8 @@ with tab3:
 
     st.markdown("### 🚗 최초 발화점 비율")
 
-    col1, col2 = st.columns(2)
-    with col1:
+    col4, col5 = st.columns(2)
+    with col4:
         fig_status = go.Figure(go.Pie(
             labels=fire_origin_counts.index,
             values=fire_origin_counts.values,
@@ -448,15 +440,13 @@ with tab3:
             textinfo='percent+label'
         ))
         fig_status.update_layout(
-            title="차량상태별 비율 (필터 적용)",
+            title="최초발화점",
             template="plotly_white",
             height=400
         )
         st.plotly_chart(fig_status, use_container_width=True)
 
-    st.markdown("### 🚗 전기차 안정성 분석 해보기")
-
-    with col2:
+    with col5:
         fig_status = go.Figure(go.Pie(
             labels=situation_counts.index,
             values=situation_counts.values,
@@ -464,12 +454,13 @@ with tab3:
             textinfo='percent+label'
         ))
         fig_status.update_layout(
-            title="차량상태별 비율 (필터 적용)",
+            title="상황",
             template="plotly_white",
             height=400
         )
         st.plotly_chart(fig_status, use_container_width=True)
 
+    st.markdown("### 🚗 전기차 안정성 분석")
 
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -483,7 +474,7 @@ with tab3:
     with col2:
         st.markdown(f"""
         <div class="kpi-card kpi-2">
-            <div class="kpi-title">고전압배터리 중 주행중(충돌)이 아닌 건</div>
+            <div class="kpi-title">고전압배터리 중 주행중(충돌)이 아닌 것</div>
             <div class="kpi-value">{filter_count:,} 건</div>
         </div>
         """, unsafe_allow_html=True)
@@ -497,6 +488,6 @@ with tab3:
         """, unsafe_allow_html=True)
     
     st.markdown("### 🌎 해외 전기차 화재 비교")
-    
+
 
 
