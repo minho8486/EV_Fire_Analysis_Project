@@ -13,11 +13,15 @@ fire_total = "통합_화재_통계.csv"
 fire_EV    = "전기차_화재_통계.csv"
 car_info   = "자동차_등록_대수_현황.csv"
 car_maker  = "차종별_전기차_화재.csv"
+foreign_fire = "해외_전기차_화재.csv"
+manufac_fire = "제조사별_전기차_화재.csv"
 
 df_fire_total = pd.read_csv(fire_total, encoding="utf-8-sig")
 df_fire_EV    = pd.read_csv(fire_EV, encoding="utf-8-sig")
 df_car_info   = pd.read_csv(car_info, encoding="utf-8-sig")
 df_car_maker  = pd.read_csv(car_maker, encoding="utf-8-sig")
+df_foreign_fire = pd.read_csv(foreign_fire, encoding="utf-8-sig")
+df_manufac_fire = pd.read_csv(manufac_fire, encoding="utf-8-sig")
 
 # ===== 전처리 =====
 df_fire_total = df_fire_total[df_fire_total["장소소분류"].isin(["승용자동차", "화물자동차", "버스"])].copy()
@@ -488,6 +492,23 @@ with tab3:
         """, unsafe_allow_html=True)
     
     st.markdown("### 🌎 해외 전기차 화재 비교")
+
+    df_forieign_cleaned = df_foreign_fire.dropna(subset=["전기차(만대당)"])
+    df_selected = df_forieign_cleaned[["연도", "국가", "전기차(만대당)"]]
+    new_row1 = {"연도": 2021, "국가": "한국", "전기차(만대당)": 1.04}
+    new_row2 = {"연도": 2022, "국가": "한국", "전기차(만대당)": 1.1}
+    new_row3 = {"연도": 2023, "국가": "한국", "전기차(만대당)": 1.32}
+    df_selected = pd.concat([df_selected, pd.DataFrame([new_row1])], ignore_index=True)
+    df_selected = pd.concat([df_selected, pd.DataFrame([new_row2])], ignore_index=True)
+    df_selected = pd.concat([df_selected, pd.DataFrame([new_row3])], ignore_index=True)
+    df_sorted_desc = df_selected.sort_values(by="연도", ascending=False)
+    df_reset = df_sorted_desc.reset_index(drop=True)
+    st.dataframe(df_reset, use_container_width=True)
+
+
+    
+
+
 
 
 
