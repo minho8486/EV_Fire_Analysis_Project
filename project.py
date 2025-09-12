@@ -417,7 +417,7 @@ with tab3:
     filter_m_ratio = round(filter_count / total_counts * 100, 2)
 
     # 추가자료 시각화
-    st.markdown("### 🔥 전기차 제조사별 화재")
+    st.markdown("## 🔥 전기차 제조사별 화재")
 
     fig_subcause = go.Figure(go.Bar(
         x=manufacturer_counts.index,
@@ -434,7 +434,7 @@ with tab3:
     )
     st.plotly_chart(fig_subcause, use_container_width=True)
 
-    st.markdown("### 🚗 최초 발화점 비율")
+    st.markdown("## 🚗 최초 발화점 비율")
 
     col4, col5 = st.columns(2)
     with col4:
@@ -465,7 +465,7 @@ with tab3:
         )
         st.plotly_chart(fig_status, use_container_width=True)
 
-    st.markdown("### 🚗 전기차 안정성 분석")
+    st.markdown("## 🚗 전기차 안정성 분석")
 
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -492,7 +492,7 @@ with tab3:
         </div>
         """, unsafe_allow_html=True)
     
-    st.markdown("### 🌎 해외 전기차 화재 비교")
+    st.markdown("## 🌎 해외 전기차 화재 비교")
 
     df_forieign_cleaned = df_foreign_fire.dropna(subset=["전기차(만대당)"])
     df_selected = df_forieign_cleaned[["연도", "국가", "전기차(만대당)"]]
