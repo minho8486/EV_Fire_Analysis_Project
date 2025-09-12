@@ -415,8 +415,8 @@ with tab3:
     st.markdown("### 🔥 전기차 제조사별 화재")
 
     fig_subcause = go.Figure(go.Bar(
-        x=manufacturer_counts.values,
-        y=manufacturer_counts.index,
+        x=manufacturer_counts.index,
+        y=manufacturer_counts.values,
         text=manufacturer_counts.values,
         textposition='auto',
         marker_color='orange'
