@@ -14,7 +14,7 @@ fire_EV    = "전기차_화재_통계.csv"
 car_info   = "자동차_등록_대수_현황.csv"
 car_maker  = "차종별_전기차_화재.csv"
 foreign_fire = "해외_전기차_화재.csv"
-manufac_fire = "제조사별_전기차_화재.csv"
+manufac_fire = "전기차_제조사_점유율_화재.csv"
 
 df_fire_total = pd.read_csv(fire_total, encoding="utf-8-sig")
 df_fire_EV    = pd.read_csv(fire_EV, encoding="utf-8-sig")
