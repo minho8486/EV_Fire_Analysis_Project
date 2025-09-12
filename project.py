@@ -501,8 +501,8 @@ with tab3:
     df_selected = pd.concat([df_selected, pd.DataFrame([new_row1])], ignore_index=True)
     df_selected = pd.concat([df_selected, pd.DataFrame([new_row2])], ignore_index=True)
     df_selected = pd.concat([df_selected, pd.DataFrame([new_row3])], ignore_index=True)
-    df_sorted_desc = df_selected.sort_values(by="연도", ascending=False)
-    df_reset = df_sorted_desc.reset_index(drop=True)
+    df_sorted_asc = df_selected.sort_values(by="연도", ascending=True)
+    df_reset = df_sorted_asc.reset_index(drop=True)
     st.dataframe(df_reset, use_container_width=True)
 
 
