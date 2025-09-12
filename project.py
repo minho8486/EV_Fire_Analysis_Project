@@ -503,7 +503,26 @@ with tab3:
     df_selected = pd.concat([df_selected, pd.DataFrame([new_row3])], ignore_index=True)
     df_sorted_asc = df_selected.sort_values(by="연도", ascending=True)
     df_reset = df_sorted_asc.reset_index(drop=True)
-    st.dataframe(df_reset, use_container_width=True)
+
+    # 국가별 연도별 전기차(만대당) Bar 차트
+    fig_bar = go.Figure(go.bar(
+        df_reset,
+        x="연도",
+        y="전기차(만대당)",
+        color="국가",
+        barmode="group",  # 국가별 그룹으로 나란히 표시
+        text="전기차(만대당)",  # 막대 위에 값 표시
+        labels={"전기차(만대당)": "전기차(만대당, 만대)"},
+        title="국가별 연도별 전기차(만대당) 비교"
+    ))
+    fig_bar.update_layout(
+        template="plotly_white",
+        xaxis=dict(type='category'),  # 연도를 카테고리로
+        yaxis=dict(title="전기차(만대당)"),
+        height=500
+    )
+    st.plotly_chart(fig_bar, use_container_width=True)
+
 
 
     
