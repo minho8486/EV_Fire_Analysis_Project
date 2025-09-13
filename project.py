@@ -585,6 +585,7 @@ with tab3:
         marker=dict(size=12, color='green'),
         text=df_manufac_fire["배터리10만대당"],
         textposition="top center"
+        yaxis="y2"
     ))
     fig.update_layout(
         title="제조사별 점유율, 전기차/배터리 10만대당 화재 비교",
