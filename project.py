@@ -387,60 +387,60 @@ with tab2:
     )
     st.plotly_chart(fig_status, use_container_width=True)
 
-# ===== 연도별 필터 전/후 & 비율 그래프 통합 =====
-st.markdown("### 📊 연도별 화재 건수 및 필터 후 비율")
+    # ===== 연도별 필터 전/후 & 비율 그래프 통합 =====
+    st.markdown("### 📊 연도별 화재 건수 및 필터 후 비율")
 
-total_by_year = df_fire_EV["연도"].value_counts().sort_index() 
-filtered_by_year = df_ev_filtered["연도"].value_counts().sort_index()
-compare_df = pd.DataFrame({
-    "연도": total_by_year.index,
-    "필터 전": total_by_year.values,
-    "필터 후": filtered_by_year.reindex(total_by_year.index, fill_value=0).values
-})
+    total_by_year = df_fire_EV["연도"].value_counts().sort_index() 
+    filtered_by_year = df_ev_filtered["연도"].value_counts().sort_index()
+    compare_df = pd.DataFrame({
+        "연도": total_by_year.index,
+        "필터 전": total_by_year.values,
+        "필터 후": filtered_by_year.reindex(total_by_year.index, fill_value=0).values
+    })
 
-# 비율 계산
-ratio_by_year = (compare_df["필터 후"] / compare_df["필터 전"] * 100).round(2)
+    # 비율 계산
+    ratio_by_year = (compare_df["필터 후"] / compare_df["필터 전"] * 100).round(2)
 
-# Figure 생성
-fig_combined = go.Figure()
+    # Figure 생성
+    fig_combined = go.Figure()
 
-# Bar - 필터 전/후
-fig_combined.add_trace(go.Bar(
-    x=compare_df["연도"], y=compare_df["필터 전"],
-    name="필터 전 (건)",
-    marker_color="lightgray",
-    text=compare_df["필터 전"],
-    textposition='outside',
-    yaxis="y1"
-))
-fig_combined.add_trace(go.Bar(
-    x=compare_df["연도"], y=compare_df["필터 후"],
-    name="필터 후 (건)",
-    marker_color="dodgerblue",
-    text=compare_df["필터 후"],
-    textposition='outside',
-    yaxis="y1"
-))
-# Line - 필터 후 비율
-fig_combined.add_trace(go.Scatter(
-    x=compare_df["연도"], y=ratio_by_year,
-    mode="lines+markers+text",
-    name="필터 후 비율 (%)",
-    text=ratio_by_year,
-    textposition="top center",
-    line=dict(color="green", width=2),
-    yaxis="y2"
-))
-# Layout 설정 (2축)
-fig_combined.update_layout(
-    title="필터 전/후 데이터 비교",
-    xaxis=dict(title="연도"),
-    yaxis=dict(title="필터 전/후 화재 (건)", side="left"),
-    yaxis2=dict(title="필터 전/후 비율 (%)", overlaying="y", side="right"),
-    barmode='group',
-    template="plotly_white"
-)
-st.plotly_chart(fig_combined, use_container_width=True)
+    # Bar - 필터 전/후
+    fig_combined.add_trace(go.Bar(
+        x=compare_df["연도"], y=compare_df["필터 전"],
+        name="필터 전 (건)",
+        marker_color="lightgray",
+        text=compare_df["필터 전"],
+        textposition='outside',
+        yaxis="y1"
+    ))
+    fig_combined.add_trace(go.Bar(
+        x=compare_df["연도"], y=compare_df["필터 후"],
+        name="필터 후 (건)",
+        marker_color="dodgerblue",
+        text=compare_df["필터 후"],
+        textposition='outside',
+        yaxis="y1"
+    ))
+    # Line - 필터 후 비율
+    fig_combined.add_trace(go.Scatter(
+        x=compare_df["연도"], y=ratio_by_year,
+        mode="lines+markers+text",
+        name="필터 후 비율 (%)",
+        text=ratio_by_year,
+        textposition="top center",
+        line=dict(color="green", width=2),
+        yaxis="y2"
+    ))
+    # Layout 설정 (2축)
+    fig_combined.update_layout(
+        title="필터 전/후 데이터 비교",
+        xaxis=dict(title="연도"),
+        yaxis=dict(title="필터 전/후 화재 (건)", side="left"),
+        yaxis2=dict(title="필터 전/후 비율 (%)", overlaying="y", side="right"),
+        barmode='group',
+        template="plotly_white"
+    )
+    st.plotly_chart(fig_combined, use_container_width=True)
 
 
 # ==============================
