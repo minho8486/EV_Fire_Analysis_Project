@@ -477,6 +477,60 @@ with tab3:
     )
     st.plotly_chart(fig_subcause, use_container_width=True)
 
+    st.markdown("### 🚗 제조사별 화재 비교")
+
+    fig = go.Figure()
+    # 왼쪽 y축 (10만대당 화재)
+    fig.add_trace(go.Scatter(
+        x=df_manufac_fire["제조사"],
+        y=df_manufac_fire["전기차10만대당"],
+        mode='lines+markers+text',
+        name="전기차 화재 10만대당 (건)",
+        marker=dict(size=10, color='red', symbol='circle'),
+        line=dict(width=2),
+        text=df_manufac_fire["전기차10만대당"],
+        textposition="top center"
+    ))
+    fig.add_trace(go.Scatter(
+        x=df_manufac_fire["제조사"],
+        y=df_manufac_fire["배터리10만대당"],
+        mode='lines+markers+text',
+        name="배터리 화재 10만대당 (건)",
+        marker=dict(size=10, color='green', symbol='triangle-up'),
+        line=dict(width=2),
+        text=df_manufac_fire["배터리10만대당"],
+        textposition="bottom center"
+    ))
+    # 오른쪽 y축 (점유율)
+    fig.add_trace(go.Scatter(
+        x=df_manufac_fire["제조사"],
+        y=df_manufac_fire["점유율"],
+        mode='lines+markers+text',
+        name="제조사 점유율 (%)",
+        marker=dict(size=10, color='orange', symbol='diamond'),
+        line=dict(width=3, dash='dash'),
+        text=df_manufac_fire["점유율"].apply(lambda x: f"{x}%"),
+        textposition="top right",
+        yaxis="y2"
+    ))
+    fig.update_layout(
+        title="제조사별 점유율 & 전기차/배터리 10만대당 화재 비교",
+        xaxis_title="제조사",
+        yaxis=dict(title="10만대당 화재 (건)"),
+        yaxis2=dict(title="점유율 (%)", overlaying="y", side="right"),
+        template="plotly_white",
+        height=600,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        ),
+        margin=dict(t=80)
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
     st.markdown("### 🚗 최초 발화점 비율")
 
     col4, col5 = st.columns(2)
@@ -565,57 +619,3 @@ with tab3:
         height=500
     )
     st.plotly_chart(fig_bar, use_container_width=True)
-
-    st.markdown("### 🚗 제조사별 화재 비교")
-
-    fig = go.Figure()
-    # 왼쪽 y축 (10만대당 화재)
-    fig.add_trace(go.Scatter(
-        x=df_manufac_fire["제조사"],
-        y=df_manufac_fire["전기차10만대당"],
-        mode='lines+markers+text',
-        name="전기차 화재 10만대당 (건)",
-        marker=dict(size=10, color='red', symbol='circle'),
-        line=dict(width=2),
-        text=df_manufac_fire["전기차10만대당"],
-        textposition="top center"
-    ))
-    fig.add_trace(go.Scatter(
-        x=df_manufac_fire["제조사"],
-        y=df_manufac_fire["배터리10만대당"],
-        mode='lines+markers+text',
-        name="배터리 화재 10만대당 (건)",
-        marker=dict(size=10, color='green', symbol='triangle-up'),
-        line=dict(width=2),
-        text=df_manufac_fire["배터리10만대당"],
-        textposition="bottom center"
-    ))
-    # 오른쪽 y축 (점유율)
-    fig.add_trace(go.Scatter(
-        x=df_manufac_fire["제조사"],
-        y=df_manufac_fire["점유율"],
-        mode='lines+markers+text',
-        name="제조사 점유율 (%)",
-        marker=dict(size=10, color='orange', symbol='diamond'),
-        line=dict(width=3, dash='dash'),
-        text=df_manufac_fire["점유율"].apply(lambda x: f"{x}%"),
-        textposition="top right",
-        yaxis="y2"
-    ))
-    fig.update_layout(
-        title="제조사별 점유율 & 전기차/배터리 10만대당 화재 비교",
-        xaxis_title="제조사",
-        yaxis=dict(title="10만대당 화재 (건)"),
-        yaxis2=dict(title="점유율 (%)", overlaying="y", side="right"),
-        template="plotly_white",
-        height=600,
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1
-        ),
-        margin=dict(t=80)
-    )
-    st.plotly_chart(fig, use_container_width=True)
