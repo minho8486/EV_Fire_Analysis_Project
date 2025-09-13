@@ -435,8 +435,8 @@ fig_combined.add_trace(go.Scatter(
 fig_combined.update_layout(
     title="필터 전/후 데이터 비교",
     xaxis=dict(title="연도"),
-    yaxis=dict(title="건수", side="left"),
-    yaxis2=dict(title="비율 (%)", overlaying="y", side="right"),
+    yaxis=dict(title="발화요인별 화재 (건)", side="left"),
+    yaxis2=dict(title="필터 전/후 비율 (%)", overlaying="y", side="right"),
     barmode='group',
     template="plotly_white"
 )
