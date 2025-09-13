@@ -268,7 +268,7 @@ with tab1:
     fig_ev.add_trace(go.Scatter(
         x=ev_fire_per_100k.index,
         y=ev_fire_per_100k.values,
-        name="전기차 화재 10만대당 (대)",
+        name="전기차 화재 10만대당 (건)",
         mode="lines+markers",
         marker_color="tomato",
         yaxis="y2"
@@ -277,7 +277,7 @@ with tab1:
         title="연도별 전기차 등록대수 & 10만대당 화재",
         xaxis_title="연도",
         yaxis=dict(title="전기차 등록대수 (대)", side="left"),
-        yaxis2=dict(title="10만대당 화재 (대)", overlaying="y", side="right"),
+        yaxis2=dict(title="10만대당 화재 (건)", overlaying="y", side="right"),
         template="plotly_white"
     )
     st.plotly_chart(fig_ev, use_container_width=True)
@@ -294,7 +294,7 @@ with tab1:
     fig_ice.add_trace(go.Scatter(
         x=ice_fire_per_100k.index,
         y=ice_fire_per_100k.values,
-        name="내연기관 화재 10만대당 (대)",
+        name="내연기관 화재 10만대당 (건)",
         mode="lines+markers",
         marker_color="orange",
         yaxis="y2"
@@ -303,7 +303,7 @@ with tab1:
         title="연도별 내연기관 등록대수 & 10만대당 화재",
         xaxis_title="연도",
         yaxis=dict(title="내연기관 등록대수 (대)", side="left"),
-        yaxis2=dict(title="10만대당 화재 (대)", overlaying="y", side="right"),
+        yaxis2=dict(title="10만대당 화재 (건)", overlaying="y", side="right"),
         template="plotly_white"
     )
     st.plotly_chart(fig_ice, use_container_width=True)
@@ -546,11 +546,11 @@ with tab3:
         barmode="group",          # 연도 안에서 국가별 막대 나란히
         text="전기차(만대당)",
         labels={"전기차(만대당)": "전기차 1만대당 (대)"},
-        title="연도별 국가별 전기차(1만대당) 비교"
+        title="국가별 전기차(1만대당) 화재"
     )
     fig_bar.update_layout(
         template="plotly_white",
-        yaxis=dict(title="전기차(1만대당)"),
+        yaxis=dict(title="전기차 1만대당 (건)"),
         height=500
     )
     st.plotly_chart(fig_bar, use_container_width=True)
@@ -572,7 +572,7 @@ with tab3:
         x=df_manufac_fire["제조사"],
         y=df_manufac_fire["전기차10만대당"],
         mode='markers+lines+text',
-        name="전기차화재 10만대당 (대)",
+        name="전기차화재 10만대당 (건)",
         marker=dict(size=12, color='red'),
         text=df_manufac_fire["전기차10만대당"],
         textposition="top center"
@@ -581,7 +581,7 @@ with tab3:
         x=df_manufac_fire["제조사"],
         y=df_manufac_fire["배터리10만대당"],
         mode='markers+lines+text',
-        name="배터리화재 10만대당 (대)",
+        name="배터리화재 10만대당 (건)",
         marker=dict(size=12, color='green'),
         text=df_manufac_fire["배터리10만대당"],
         textposition="top center"
@@ -589,7 +589,8 @@ with tab3:
     fig.update_layout(
         title="제조사별 점유율, 전기차/배터리 10만대당 화재 비교",
         xaxis_title="제조사",
-        yaxis_title="값",
+        yaxis=dict(title="10만대당 화재 (건)", side="left"),
+        yaxis2=dict(title="점유율 (%)", overlaying="y", side="right"),
         template="plotly_white",
         height=600
     )
