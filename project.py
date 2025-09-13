@@ -136,18 +136,34 @@ with tab1:
 
     # Plotly: 화재 건수 + EV 비율
     fig_fire = go.Figure()
-    fig_fire.add_trace(go.Bar(x=yearly_total.index, y=yearly_total.values, name="전체 화재 건수", marker_color="lightgray"))
-    fig_fire.add_trace(go.Bar(x=yearly_ev.index, y=yearly_ev.values, name="EV 화재 건수", marker_color="tomato"))
-    fig_fire.add_trace(go.Scatter(x=yearly_ratio.index, y=yearly_ratio.values, name="EV 화재 비율 (%)",
-                                  mode="lines+markers", yaxis="y2", line=dict(color="green", width=2)))
+    fig_fire.add_trace(go.Bar(
+        x=yearly_total.index,
+        y=yearly_total.values,
+        name="전체 화재 건수",
+        marker_color="lightgray"
+    ))
+    fig_fire.add_trace(go.Bar(
+        x=yearly_ev.index,
+        y=yearly_ev.values,
+        name="EV 화재 건수",
+        marker_color="tomato"
+    ))
+    fig_fire.add_trace(go.Scatter(
+        x=yearly_ratio.index,
+        y=yearly_ratio.values,
+        name="EV 화재 비율 (%)",
+        mode="lines+markers",
+        yaxis="y2",
+        line=dict(color="green", width=2)
+    ))
     fig_fire.update_layout(
         title="연도별 EV 화재 분석 (전체/EV 건수 + 비율)",
         xaxis=dict(title="연도"),
         yaxis=dict(title="화재 건수"),
         yaxis2=dict(title="EV 화재 비율 (%)", overlaying="y", side="right"),
-        barmode="group", template="plotly_white"
+        barmode="stack",   # ✅ 여기서 group → stack 으로 변경
+        template="plotly_white"
     )
-    st.plotly_chart(fig_fire, use_container_width=True)
 
     # ===== 자동차 등록 대수 분석 =====
     st.markdown("### 🚗 자동차 등록 대수 분석")
@@ -184,18 +200,35 @@ with tab1:
 
     # Plotly: 등록대수 + EV 비율
     fig_car = go.Figure()
-    fig_car.add_trace(go.Bar(x=df_car_info["연도"], y=df_car_info["전체차량등록대수"], name="전체 차량 등록대수", marker_color="lightblue"))
-    fig_car.add_trace(go.Bar(x=df_car_info["연도"], y=df_car_info["전기차등록대수"], name="EV 차량 등록대수", marker_color="orange"))
-    fig_car.add_trace(go.Scatter(x=df_car_info["연도"], y=df_car_info["전기차비율(%)"], name="EV 등록 비율 (%)",
-                                 mode="lines+markers", yaxis="y2", line=dict(color="darkblue", width=2)))
+    fig_car.add_trace(go.Bar(
+        x=df_car_info["연도"],
+        y=df_car_info["전체차량등록대수"],
+        name="전체 차량 등록대수",
+        marker_color="lightblue"
+    ))
+    fig_car.add_trace(go.Bar(
+        x=df_car_info["연도"],
+        y=df_car_info["전기차등록대수"],
+        name="EV 차량 등록대수",
+        marker_color="orange"
+    ))
+    fig_car.add_trace(go.Scatter(
+        x=df_car_info["연도"],
+        y=df_car_info["전기차비율(%)"],
+        name="EV 등록 비율 (%)",
+        mode="lines+markers",
+        yaxis="y2",
+        line=dict(color="darkblue", width=2)
+    ))
     fig_car.update_layout(
         title="연도별 자동차 등록대수 및 EV 비율",
         xaxis=dict(title="연도"),
         yaxis=dict(title="등록 대수"),
         yaxis2=dict(title="EV 등록 비율 (%)", overlaying="y", side="right"),
-        barmode="group", template="plotly_white"
+        barmode="stack",   # ✅ group → stack
+        template="plotly_white"
     )
-    st.plotly_chart(fig_car, use_container_width=True)
+
 
     st.markdown("### 🔥 10만대당 화재 건수 비교")
 
