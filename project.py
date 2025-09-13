@@ -226,7 +226,7 @@ with tab1:
         y=df_car_info["전기차비율(%)"],
         name="EV 등록 비율 (%)",
         mode="lines+markers",
-        line=dict(color="darkblue", width=2),
+        line=dict(color="toamto", width=2),
         yaxis="y2"
     ))
     fig_car.update_layout(
