@@ -531,7 +531,7 @@ with tab3:
         x=df_manufac_fire["제조사"],
         y=df_manufac_fire["점유율"],
         mode='markers+lines+text',
-        name="제조사 점유율(%)",
+        name="제조사 점유율 (%)",
         marker=dict(size=12, color='yellow'),
         text=df_manufac_fire["점유율"],
         textposition="top center"
