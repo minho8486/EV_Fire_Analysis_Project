@@ -387,50 +387,56 @@ with tab2:
     )
     st.plotly_chart(fig_status, use_container_width=True)
 
-    # ===== 연도별 필터 전/후 비교 =====
-    st.markdown("### 📊 연도별 화재 건수 (필터 전 vs 후)")
-    total_by_year = df_fire_EV["연도"].value_counts().sort_index() 
-    filtered_by_year = df_ev_filtered["연도"].value_counts().sort_index()
-    compare_df = pd.DataFrame({
+# ===== 연도별 필터 전/후 & 비율 그래프 통합 =====
+st.markdown("### 📊 연도별 화재 건수 및 필터 후 비율")
+
+total_by_year = df_fire_EV["연도"].value_counts().sort_index() 
+filtered_by_year = df_ev_filtered["연도"].value_counts().sort_index()
+compare_df = pd.DataFrame({
     "연도": total_by_year.index,
     "필터 전": total_by_year.values,
     "필터 후": filtered_by_year.reindex(total_by_year.index, fill_value=0).values
-    })
+})
 
-    fig_compare = go.Figure()
-    fig_compare.add_trace(go.Bar(
-        x=compare_df["연도"], y=compare_df["필터 전"], name="필터 전", marker_color="lightgray", text=compare_df["필터 전"], textposition='outside'
-    ))
-    fig_compare.add_trace(go.Bar(
-        x=compare_df["연도"], y=compare_df["필터 후"], name="필터 후", marker_color="dodgerblue", text=compare_df["필터 후"], textposition='outside'
-    ))
-    fig_compare.update_layout(
-        barmode='group',
-        title="연도별 필터 전/후 화재 건수 비교",
-        xaxis_title="연도",
-        yaxis_title="건수",
-        template="plotly_white"
-    )
-    st.plotly_chart(fig_compare, use_container_width=True)
+# 비율 계산
+ratio_by_year = (compare_df["필터 후"] / compare_df["필터 전"] * 100).round(2)
 
-    # ===== 연도별 필터 후 비율 (라인 그래프) =====
-    st.markdown("### 📈 연도별 필터 후/전체 비율 (%)")
-    ratio_by_year = (compare_df["필터 후"] / compare_df["필터 전"] * 100).round(2)
-    fig_ratio = go.Figure()
-    fig_ratio.add_trace(go.Scatter(
-        x=compare_df["연도"], y=ratio_by_year,
-        mode="lines+markers+text",
-        text=ratio_by_year, textposition="top center",
-        line=dict(color="green", width=2),
-        name="필터 후 비율 (%)"
-    ))
-    fig_ratio.update_layout(
-        title="연도별 전체 대비 필터 후 비율 (%)",
-        xaxis_title="연도",
-        yaxis_title="비율 (%)",
-        template="plotly_white"
-    )
-    st.plotly_chart(fig_ratio, use_container_width=True)
+# Figure 생성
+fig_combined = go.Figure()
+
+# Bar - 필터 전/후
+fig_combined.add_trace(go.Bar(
+    x=compare_df["연도"], y=compare_df["필터 전"],
+    name="필터 전", marker_color="lightgray",
+    text=compare_df["필터 전"], textposition='outside',
+    yaxis="y1"
+))
+fig_combined.add_trace(go.Bar(
+    x=compare_df["연도"], y=compare_df["필터 후"],
+    name="필터 후", marker_color="dodgerblue",
+    text=compare_df["필터 후"], textposition='outside',
+    yaxis="y1"
+))
+# Line - 필터 후 비율
+fig_combined.add_trace(go.Scatter(
+    x=compare_df["연도"], y=ratio_by_year,
+    mode="lines+markers+text",
+    name="필터 후 비율 (%)",
+    text=ratio_by_year, textposition="top center",
+    line=dict(color="green", width=2),
+    yaxis="y2"
+))
+# Layout 설정 (2축)
+fig_combined.update_layout(
+    title="연도별 화재 건수 및 필터 후 비율 (%)",
+    xaxis=dict(title="연도"),
+    yaxis=dict(title="건수", side="left"),
+    yaxis2=dict(title="비율 (%)", overlaying="y", side="right"),
+    barmode='group',
+    template="plotly_white"
+)
+st.plotly_chart(fig_combined, use_container_width=True)
+
 
 # ==============================
 # Tab3: 지역별 충전소 대비 전기차 화재 비율
