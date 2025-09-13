@@ -407,14 +407,18 @@ fig_combined = go.Figure()
 # Bar - 필터 전/후
 fig_combined.add_trace(go.Bar(
     x=compare_df["연도"], y=compare_df["필터 전"],
-    name="필터 전", marker_color="lightgray",
-    text=compare_df["필터 전"], textposition='outside',
+    name="필터 전 (건)",
+    marker_color="lightgray",
+    text=compare_df["필터 전"],
+    textposition='outside',
     yaxis="y1"
 ))
 fig_combined.add_trace(go.Bar(
     x=compare_df["연도"], y=compare_df["필터 후"],
-    name="필터 후", marker_color="dodgerblue",
-    text=compare_df["필터 후"], textposition='outside',
+    name="필터 후 (건)",
+    marker_color="dodgerblue",
+    text=compare_df["필터 후"],
+    textposition='outside',
     yaxis="y1"
 ))
 # Line - 필터 후 비율
@@ -422,13 +426,14 @@ fig_combined.add_trace(go.Scatter(
     x=compare_df["연도"], y=ratio_by_year,
     mode="lines+markers+text",
     name="필터 후 비율 (%)",
-    text=ratio_by_year, textposition="top center",
+    text=ratio_by_year,
+    textposition="top center",
     line=dict(color="green", width=2),
     yaxis="y2"
 ))
 # Layout 설정 (2축)
 fig_combined.update_layout(
-    title="연도별 화재 건수 및 필터 후 비율 (%)",
+    title="필터 전/후 데이터 비교",
     xaxis=dict(title="연도"),
     yaxis=dict(title="건수", side="left"),
     yaxis2=dict(title="비율 (%)", overlaying="y", side="right"),
