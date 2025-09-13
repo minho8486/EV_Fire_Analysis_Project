@@ -130,19 +130,15 @@ with tab1:
         """, unsafe_allow_html=True)
 
     # ===== 연도별 화재 데이터 준비 =====
-    yearly_total = df_fire_total.groupby("연도").size()
-    yearly_ev = df_fire_EV.groupby("연도").size()
-    yearly_ratio = (yearly_ev / yearly_total * 100).round(2)
-
-    # 비EV 화재 건수 계산
     df_fire_count = (
         df_fire_total.groupby("연도").size().reset_index(name="전체")
         .merge(df_fire_EV.groupby("연도").size().reset_index(name="EV"), on="연도", how="left")
     )
     df_fire_count["EV"] = df_fire_count["EV"].fillna(0).astype(int)
     df_fire_count["비EV"] = df_fire_count["전체"] - df_fire_count["EV"]
+    df_fire_count["EV비율(%)"] = (df_fire_count["EV"] / df_fire_count["전체"] * 100).round(2)
 
-    # 100% stacked bar chart
+    # 🔥 화재 건수 시각화 (100% stacked + EV 비율 선)
     fig_fire = go.Figure()
     fig_fire.add_trace(go.Bar(
         x=df_fire_count["연도"],
@@ -156,10 +152,19 @@ with tab1:
         name="비EV 화재 건수",
         marker_color="lightgray"
     ))
+    fig_fire.add_trace(go.Scatter(
+        x=df_fire_count["연도"],
+        y=df_fire_count["EV비율(%)"],
+        name="EV 화재 비율 (%)",
+        mode="lines+markers",
+        line=dict(color="green", width=2),
+        yaxis="y2"
+    ))
     fig_fire.update_layout(
-        title="연도별 EV vs 비EV 화재 비율 (100% Stacked)",
+        title="연도별 EV vs 비EV 화재 비율 (100% Stacked + EV 비율 선)",
         xaxis=dict(title="연도"),
-        yaxis=dict(title="비율 (%)"),
+        yaxis=dict(title="비율 (%)", range=[0, 100]),
+        yaxis2=dict(title="EV 화재 비율 (%)", overlaying="y", side="right"),
         barmode="stack",
         barnorm="percent",   # ✅ 전체를 100%로 정규화
         template="plotly_white",
@@ -171,6 +176,7 @@ with tab1:
     # ===== 자동차 등록 대수 분석 =====
     st.markdown("### 🚗 자동차 등록 대수 분석")
     df_car_info["전기차비율(%)"] = (df_car_info["전기차등록대수"] / df_car_info["전체차량등록대수"] * 100).round(2)
+    df_car_info["비EV등록대수"] = df_car_info["전체차량등록대수"] - df_car_info["전기차등록대수"]
 
     latest_year = df_car_info["연도"].max()
     latest_data = df_car_info[df_car_info["연도"] == latest_year].iloc[0]
@@ -201,10 +207,7 @@ with tab1:
         </div>
         """, unsafe_allow_html=True)
 
-    # 비EV 차량 등록대수 계산
-    df_car_info["비EV등록대수"] = df_car_info["전체차량등록대수"] - df_car_info["전기차등록대수"]
-
-    # Plotly: 등록대수 + EV 비율
+    # 🚗 등록대수 시각화 (100% stacked + EV 등록 비율 선)
     fig_car = go.Figure()
     fig_car.add_trace(go.Bar(
         x=df_car_info["연도"],
@@ -218,17 +221,26 @@ with tab1:
         name="비EV 차량 등록대수",
         marker_color="lightblue"
     ))
-
+    fig_car.add_trace(go.Scatter(
+        x=df_car_info["연도"],
+        y=df_car_info["전기차비율(%)"],
+        name="EV 등록 비율 (%)",
+        mode="lines+markers",
+        line=dict(color="darkblue", width=2),
+        yaxis="y2"
+    ))
     fig_car.update_layout(
-        title="연도별 EV vs 비EV 등록 비율 (100% Stacked)",
+        title="연도별 EV vs 비EV 등록 비율 (100% Stacked + EV 비율 선)",
         xaxis=dict(title="연도"),
-        yaxis=dict(title="비율 (%)"),
+        yaxis=dict(title="비율 (%)", range=[0, 100]),
+        yaxis2=dict(title="EV 등록 비율 (%)", overlaying="y", side="right"),
         barmode="stack",
-        barnorm="percent",   # ✅ 막대 전체를 100%로 정규화
+        barnorm="percent",   # ✅ 전체를 100%로 정규화
         template="plotly_white",
         height=500
     )
     st.plotly_chart(fig_car, use_container_width=True)
+
 
     st.markdown("### 🔥 10만대당 화재 건수 비교")
 
