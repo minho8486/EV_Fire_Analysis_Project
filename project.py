@@ -502,12 +502,12 @@ with tab3:
     df_selected = pd.concat([df_selected, pd.DataFrame([new_row1])], ignore_index=True)
     df_selected = pd.concat([df_selected, pd.DataFrame([new_row2])], ignore_index=True)
     df_selected = pd.concat([df_selected, pd.DataFrame([new_row3])], ignore_index=True)
-    df_sorted_asc = df_selected.sort_values(by="연도", ascending=True)
-    df_reset = df_sorted_asc.reset_index(drop=True)
+    df_selected["연도"] = df_selected["연도"].astype(int)
+    df_selected = df_selected.sort_values(by="연도", ascending=True).reset_index(drop=True)
 
     # 연도별 그룹 국가별 막대그래프
     fig_bar = px.bar(
-        df_reset,
+        df_selected,
         x="연도",
         y="전기차(만대당)",
         color="국가",
