@@ -226,7 +226,7 @@ with tab1:
         y=df_car_info["전기차비율(%)"],
         name="EV 등록 비율 (%)",
         mode="lines+markers",
-        line=dict(color="#98df8a", width=2),
+        line=dict(color="royalblue", width=2),
         yaxis="y2"
     ))
     fig_car.update_layout(
@@ -313,8 +313,6 @@ with tab1:
 
     # Tab1 분석 인사이트
     st.markdown("### 📌 분석 인사이트")
-    
-
 
 # ==============================
 # Tab2: 필터 적용 분석
