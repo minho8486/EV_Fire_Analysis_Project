@@ -143,28 +143,28 @@ with tab1:
     fig_fire.add_trace(go.Bar(
         x=df_fire_count["연도"],
         y=df_fire_count["EV"],
-        name="EV 화재 건수",
+        name="전기차 화재 건수",
         marker_color="tomato"
     ))
     fig_fire.add_trace(go.Bar(
         x=df_fire_count["연도"],
         y=df_fire_count["비EV"],
-        name="비EV 화재 건수",
+        name="전체 화재 건수",
         marker_color="lightgray"
     ))
     fig_fire.add_trace(go.Scatter(
         x=df_fire_count["연도"],
         y=df_fire_count["EV비율(%)"],
-        name="EV 화재 비율 (%)",
+        name="전기차 화재 비율 (%)",
         mode="lines+markers",
         line=dict(color="green", width=2),
         yaxis="y2"
     ))
     fig_fire.update_layout(
-        title="연도별 EV vs 비EV 화재 건수 (전체 건수 기준 + EV 비율 선)",
+        title="전체/전기차 화재 비교",
         xaxis=dict(title="연도"),
         yaxis=dict(title="화재 건수"),
-        yaxis2=dict(title="EV 화재 비율 (%)", overlaying="y", side="right"),
+        yaxis2=dict(title="전기차 화재 비율 (%)", overlaying="y", side="right"),
         barmode="stack",  # EV + 비EV 누적 표시
         template="plotly_white",
         height=500
@@ -211,25 +211,25 @@ with tab1:
     fig_car.add_trace(go.Bar(
         x=df_car_info["연도"],
         y=df_car_info["전기차등록대수"],
-        name="EV 차량 등록대수",
+        name="전기차 등록대수",
         marker_color="orange"
     ))
     fig_car.add_trace(go.Bar(
         x=df_car_info["연도"],
         y=df_car_info["비EV등록대수"],
-        name="비EV 차량 등록대수",
+        name="전체 차량 등록대수",
         marker_color="lightblue"
     ))
     fig_car.add_trace(go.Scatter(
         x=df_car_info["연도"],
         y=df_car_info["전기차비율(%)"],
-        name="EV 등록 비율 (%)",
+        name="전기차 등록 비율 (%)",
         mode="lines+markers",
         line=dict(color="royalblue", width=2),
         yaxis="y2"
     ))
     fig_car.update_layout(
-        title="연도별 EV vs 비EV 등록대수 (전체 등록대수 기준 + EV 비율 선)",
+        title="전체/전기차 등록 비교",
         xaxis=dict(title="연도"),
         yaxis=dict(title="등록대수"),
         yaxis2=dict(title="EV 등록 비율 (%)", overlaying="y", side="right"),
@@ -261,14 +261,14 @@ with tab1:
     fig_ev.add_trace(go.Bar(
         x=ev_registered.index,
         y=ev_registered.values,
-        name="EV 등록대수",
+        name="전기차 등록대수",
         marker_color="royalblue",
         yaxis="y1"
     ))
     fig_ev.add_trace(go.Scatter(
         x=ev_fire_per_100k.index,
         y=ev_fire_per_100k.values,
-        name="EV 화재 (10만대당 건수)",
+        name="전기차 화재 10만대당 (대)",
         mode="lines+markers",
         marker_color="tomato",
         yaxis="y2"
@@ -276,7 +276,7 @@ with tab1:
     fig_ev.update_layout(
         title="연도별 전기차 등록대수 & 10만대당 화재 건수",
         xaxis_title="연도",
-        yaxis=dict(title="EV 등록대수", side="left"),
+        yaxis=dict(title="전기차 등록대수", side="left"),
         yaxis2=dict(title="10만대당 화재 건수", overlaying="y", side="right"),
         template="plotly_white"
     )
@@ -294,7 +294,7 @@ with tab1:
     fig_ice.add_trace(go.Scatter(
         x=ice_fire_per_100k.index,
         y=ice_fire_per_100k.values,
-        name="내연기관 화재 (10만대당 건수)",
+        name="내연기관 화재 10만대당 (대)",
         mode="lines+markers",
         marker_color="orange",
         yaxis="y2"
