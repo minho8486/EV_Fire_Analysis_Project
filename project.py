@@ -443,8 +443,6 @@ with tab2:
 
 
 with tab3:
-    st.markdown("### 🔥 제조사별 전기차 화재 통계")
-
     # 시각화용 데이터
     manufacturer_counts = df_car_maker["제조사"].value_counts()
     fire_origin_counts = df_car_maker["최초발화점"].value_counts()
