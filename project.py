@@ -518,7 +518,6 @@ with tab3:
     )
     fig_bar.update_layout(
         template="plotly_white",
-        xaxis=dict(type='category'),  # 연도를 순서대로 표시
         yaxis=dict(title="전기차(1만대당)"),
         height=500
     )
