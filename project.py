@@ -164,6 +164,7 @@ with tab1:
         barmode="stack",   # ✅ 여기서 group → stack 으로 변경
         template="plotly_white"
     )
+    st.plotly_chart(fig_fire, use_container_width=True)
 
     # ===== 자동차 등록 대수 분석 =====
     st.markdown("### 🚗 자동차 등록 대수 분석")
@@ -228,6 +229,7 @@ with tab1:
         barmode="stack",   # ✅ group → stack
         template="plotly_white"
     )
+    st.plotly_chart(fig_car, use_container_width=True)
 
 
     st.markdown("### 🔥 10만대당 화재 건수 비교")
