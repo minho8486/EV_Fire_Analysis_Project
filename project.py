@@ -513,7 +513,7 @@ with tab3:
         color="국가",
         barmode="group",          # 연도 안에서 국가별 막대 나란히
         text="전기차(만대당)",
-        labels={"전기차(만대당)": "전기차(1만대당, 만대)"},
+        labels={"전기차(만대당)": "전기차 1만대당 (대)"},
         title="연도별 국가별 전기차(1만대당) 비교"
     )
     fig_bar.update_layout(
@@ -533,7 +533,7 @@ with tab3:
         y=df_manufac_fire["점유율"],
         mode='markers+lines+text',
         name="제조사 점유율(%)",
-        marker=dict(size=12, color='blue'),
+        marker=dict(size=12, color='yellow'),
         text=df_manufac_fire["점유율"],
         textposition="top center"
     ))
@@ -541,7 +541,7 @@ with tab3:
         x=df_manufac_fire["제조사"],
         y=df_manufac_fire["전기차10만대당"],
         mode='markers+lines+text',
-        name="전기차화재 10만대당",
+        name="전기차화재 10만대당 (대)",
         marker=dict(size=12, color='red'),
         text=df_manufac_fire["전기차10만대당"],
         textposition="top center"
@@ -550,7 +550,7 @@ with tab3:
         x=df_manufac_fire["제조사"],
         y=df_manufac_fire["배터리10만대당"],
         mode='markers+lines+text',
-        name="배터리화재 10만대당",
+        name="배터리화재 10만대당 (대)",
         marker=dict(size=12, color='green'),
         text=df_manufac_fire["배터리10만대당"],
         textposition="top center"
