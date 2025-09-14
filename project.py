@@ -308,8 +308,32 @@ with tab1:
     )
     st.plotly_chart(fig_ice, use_container_width=True)
 
+    # ===== 비율 평균 계산 =====
+    # EV 화재 비율 평균
+    avg_ev_fire_ratio = df_fire_count["EV비율(%)"].mean().round(2)
+
+    # EV 등록 비율 평균
+    avg_ev_reg_ratio = df_car_info["전기차비율(%)"].mean().round(2)
+
+    # EV/ICE 1만대당 화재 평균
+    avg_ev_fire_per_10k = ev_fire_per_100k.mean().round(2)
+    avg_ice_fire_per_10k = ice_fire_per_100k.mean().round(2)
     # Tab1 분석 인사이트
     st.markdown("### 📌 분석 인사이트")
+
+    st.markdown(f"""
+    #### 1. 전기차 화재 건수 비율
+    - 전체 차량 화재 대비 전기차 화재 비율은 평균 **{avg_ev_fire_ratio}%** 수준으로, 아직은 소수에 불과합니다.
+    - 다만 연도별로 점차 증가하는 추세로, 전기차 보급 확산과 비례해 화재 건수도 늘어나고 있습니다.
+
+    #### 2. 등록대수 대비 화재 비율
+    - 전기차 등록 비율은 평균 **{avg_ev_reg_ratio}%**로 최근 빠르게 확대되고 있습니다.
+    - 하지만 화재 건수 증가 속도는 등록대수 증가에 비해 상대적으로 낮아, **보급 확대 대비 안정적**이라 볼 수 있습니다.
+
+    #### 3. 1만대당 화재 발생 비교 (EV vs 내연기관)
+    - 전기차의 1만대당 화재 발생은 평균 **{avg_ev_fire_per_10k}건**, 내연기관은 평균 **{avg_ice_fire_per_10k}건**입니다.
+    - 즉, 전기차는 내연기관보다 단위 등록대수당 화재 발생 위험이 **더 낮거나 동등한 수준**입니다.
+    """)
 
 # ==============================
 # Tab2: 필터 적용 분석
@@ -619,3 +643,44 @@ with tab3:
         height=500
     )
     st.plotly_chart(fig_bar, use_container_width=True)
+
+    st.markdown("### 📌 분석 인사이트")
+
+    # 해외 vs 한국 전기차 화재 평균 (1만대당)
+    avg_foreign = df_forieign_cleaned["전기차(만대당)"].mean().round(2)
+    avg_korea = df_selected[df_selected["국가"]=="한국"]["전기차(만대당)"].mean().round(2)
+
+    # 비교 대상 그룹
+    low_risk_makers = ["현대자동차", "기아", "테슬라"]
+    high_risk_makers = ["한국지엠", "폭스바겐코리아", "르노코리아"]
+
+    # 데이터 필터링
+    df_low = df_manufac_fire[df_manufac_fire["제조사"].isin(low_risk_makers)]
+    df_high = df_manufac_fire[df_manufac_fire["제조사"].isin(high_risk_makers)]
+
+    # 평균 계산
+    avg_low_share = df_low["점유율"].mean().round(2)
+    avg_low_fire = df_low["전기차10만대당"].mean().round(2)
+
+    avg_high_share = df_high["점유율"].mean().round(2)
+    avg_high_fire = df_high["전기차10만대당"].mean().round(2)
+
+    st.markdown(f"""
+    #### ✅ 점유율 대비 화재 건수가 적은 그룹
+    - **현대자동차, 기아, 테슬라**
+    - 평균 점유율: **{avg_low_share}%**
+    - 10만대당 화재 발생: **{avg_low_fire}건**
+    - 보급 점유율이 높은데도 단위 등록대수 대비 화재 발생이 상대적으로 적어 **안정적인 그룹**으로 평가됨.
+
+    #### ⚠️ 점유율 대비 화재 건수가 많은 그룹
+    - **한국지엠, 폭스바겐코리아, 르노코리아**
+    - 평균 점유율: **{avg_high_share}%**
+    - 10만대당 화재 발생: **{avg_high_fire}건**
+    - 시장 점유율은 낮지만 단위 차량당 화재 발생률은 높아, **상대적으로 위험도가 높은 그룹**으로 구분됨.
+
+    #### 해외 vs 한국 전기차 화재 비교
+    - 해외 국가 평균 전기차 화재 발생률은 약 **{avg_foreign}건/1만대** 수준입니다.
+    - 같은 기간 한국은 평균 **{avg_korea}건/1만대**로, 해외 주요국과 **비슷하거나 더 낮은 수준**입니다.
+    - 따라서 한국 전기차의 화재 위험은 국제적으로 보았을 때 **상대적으로 안정적**인 수준으로 평가할 수 있습니다.
+    """)
+
