@@ -515,7 +515,7 @@ with tab3:
         text=df_manufac_fire["전기차10만대당"],
         textposition="top center"
     ))
-    fig.add_trace(go.Scatter(
+    fig.add_trace(go.Bar(
         x=df_manufac_fire["제조사"],
         y=df_manufac_fire["배터리10만대당"],
         mode='lines+markers+text',
@@ -526,7 +526,7 @@ with tab3:
         textposition="bottom center"
     ))
     # 오른쪽 y축 (점유율)
-    fig.add_trace(go.Scatter(
+    fig.add_trace(go.Bar(
         x=df_manufac_fire["제조사"],
         y=df_manufac_fire["점유율"],
         mode='lines+markers+text',
